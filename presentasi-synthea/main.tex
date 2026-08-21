@@ -1,0 +1,322 @@
+% !TEX root = main.tex
+\documentclass[aspectratio=169,10pt]{beamer}
+
+\usetheme{UGM}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{amsmath}
+\usetikzlibrary{arrows.meta,positioning,fit,calc}
+
+\definecolor{successGreen}{HTML}{2E7D5B}
+\definecolor{softGold}{HTML}{FFF4C2}
+\definecolor{softGreen}{HTML}{E8F4EE}
+
+\title[OpenMRS BM25 MTSamples]{Sistem Information Retrieval Berbasis BM25\\pada Platform OpenMRS}
+\subtitle{Pemanfaatan Dataset MTSamples Medical Transcriptions}
+\author{\begin{tabular}{@{}l@{\hspace{0.45cm}}l@{}}
+Ade Dwi Prayitno & 25/563076/PPA/07097 \\
+Aldi Indrawan & 25/557923/PPA/07038 \\
+Ari Rudiatama & 25/569437/PPA/07170 \\
+Dimas Ihdam Maulana & 25/562999/PPA/07090 \\
+Wiladahtul Awaliah & 25/569610/PPA/07174
+\end{tabular}}
+\institute{Magister Ilmu Komputer - Universitas Gadjah Mada}
+\date{2026}
+\setugmcoverdesc{PROPOSAL PROYEK STBI}
+
+\newcommand{\source}[1]{\vfill{\scriptsize\color{ugmBlueMid}#1\par}\vspace*{0.42cm}}
+\newcommand{\smallnote}[1]{{\scriptsize\color{ugmBlueMid}#1}}
+\newcommand{\keyword}[1]{\textbf{\color{ugmBlueDark}#1}}
+
+\begin{document}
+
+% 1
+\begin{frame}[plain]
+  \titlepage
+\end{frame}
+
+% 2
+\sectionframe{Latar Belakang}
+
+% 3
+\begin{frame}{Pencarian Klinis Tidak Cukup Hanya \textit{Exact Match}}
+  \framesubtitle{Catatan medis memuat istilah, singkatan, dan variasi penulisan.}
+  \begin{columns}[T,onlytextwidth]
+    \column{0.31\textwidth}
+    \begin{block}{Masalah}
+      Kata kunci persis dapat melewatkan rekam yang memakai istilah berbeda.
+    \end{block}
+    \column{0.31\textwidth}
+    \begin{block}{Kebutuhan}
+      Dokumen perlu diurutkan menurut relevansi, bukan hanya cocok atau tidak cocok.
+    \end{block}
+    \column{0.31\textwidth}
+    \begin{block}{Arah solusi}
+      BM25 memberikan perankingan probabilistik yang mempertimbangkan frekuensi istilah dan panjang dokumen.
+    \end{block}
+  \end{columns}
+  \vspace{0.35cm}
+  \begin{center}
+    {\Large\color{ugmBlueDark}\textbf{Tujuan: menemukan rekam klinis yang paling relevan lebih cepat.}}
+  \end{center}
+\end{frame}
+
+% 4
+\begin{frame}{Dataset Proyek Beralih ke MTSamples}
+  \framesubtitle{Koleksi transkripsi medis untuk pengembangan dan evaluasi retrieval teks.}
+  \begin{columns}[T,onlytextwidth]
+    \column{0.62\textwidth}
+    \begin{block}{MTSamples}
+      MTSamples menyediakan contoh transkripsi medis naratif. Kolom \textit{transcription} dapat langsung menjadi dokumen yang diindeks dan diurutkan oleh BM25.
+    \end{block}
+    \vspace{0.12cm}
+    \begin{tikzpicture}[
+      card/.style={rounded corners=3pt,draw=ugmBlueDark,fill=ugmSoft,text width=2.25cm,minimum height=1.35cm,align=center,inner sep=5pt},
+      arr/.style={-{Stealth[length=1.8mm]},thick,color=ugmBlueDark}]
+      \node[card] (s) {\textbf{MTSamples}\\transkripsi medis};
+      \node[card,right=0.35cm of s] (csv) {\textbf{Transcription}\\teks naratif};
+      \node[card,right=0.35cm of csv] (ir) {\textbf{Korpus IR}\\dokumen klinis};
+      \draw[arr] (s)--(csv); \draw[arr] (csv)--(ir);
+    \end{tikzpicture}
+    \column{0.34\textwidth}
+    \begin{block}{Mengapa MTSamples?}
+      \begin{itemize}
+        \item Teks bebas siap untuk BM25.
+        \item Memiliki metadata spesialisasi.
+        \item Ada \textit{description} dan \textit{keywords}.
+        \item Cocok untuk uji perankingan dokumen klinis.
+      \end{itemize}
+    \end{block}
+  \end{columns}
+  \source{Sumber: MTSamples Medical Transcriptions, Kaggle \texttt{tboyle10/medicaltranscriptions}.}
+\end{frame}
+
+% 5
+\begin{frame}{MTSamples Menyediakan Korpus Teks Medis yang Siap Diindeks}
+  \framesubtitle{Statistik dihitung dari file CSV lokal; baris header tidak dihitung.}
+  \centering
+  \begin{tikzpicture}[
+    metric/.style={rounded corners=3pt,draw=ugmBlueDark,fill=ugmSoft,text width=2.28cm,minimum height=1.45cm,align=center,inner sep=5pt}]
+    \node[metric] (p) {\fontsize{14}{16}\selectfont\textbf{4.999}\\[-1pt]\scriptsize record};
+    \node[metric,right=0.23cm of p] (e) {\fontsize{14}{16}\selectfont\textbf{4.966}\\[-1pt]\scriptsize transkripsi};
+    \node[metric,right=0.23cm of e] (o) {\fontsize{14}{16}\selectfont\textbf{40}\\[-1pt]\scriptsize spesialisasi};
+    \node[metric,right=0.23cm of o] (m) {\fontsize{14}{16}\selectfont\textbf{3.052}\\[-1pt]\scriptsize rata-rata karakter};
+  \end{tikzpicture}
+  \vspace{0.35cm}
+  \begin{columns}[T,onlytextwidth]
+    \column{0.43\textwidth}
+    \begin{block}{Spesialisasi terbanyak}
+      \begin{tabular}{@{}lr@{}}
+        Surgery & 1.103 \\
+        Consult - History and Phy. & 516 \\
+        Cardiovascular / Pulmonary & 372 \\
+        Orthopedic & 355 \\
+        Radiology & 273 \\
+      \end{tabular}
+    \end{block}
+    \column{0.49\textwidth}
+    \begin{block}{Implikasi untuk IR}
+      Satu baris MTSamples dapat menjadi satu dokumen. Field \textit{transcription} menjadi isi utama, dengan \textit{specialty}, \textit{description}, dan \textit{keywords} sebagai metadata.
+    \end{block}
+  \end{columns}
+  \source{Sumber: pengolahan dataset MTSamples.}
+\end{frame}
+
+% 6
+\sectionframe{Metodologi}
+
+% 7
+\begin{frame}{Kolom MTSamples Dipetakan Menjadi Dokumen Pencarian Klinis}
+  \scriptsize
+  \renewcommand{\arraystretch}{1.27}
+  \begin{tabular}{p{0.22\textwidth}p{0.34\textwidth}p{0.32\textwidth}}
+    \toprule
+    \textbf{Sumber CSV} & \textbf{Kolom yang dipilih} & \textbf{Peran dalam indeks} \\
+    \midrule
+    \texttt{transcription} & isi transkripsi medis & dokumen utama BM25 \\
+    \texttt{description} & ringkasan singkat kasus & konteks dokumen \\
+    \texttt{medical\_specialty} & bidang spesialisasi & filter atau \textit{boost} \\
+    \texttt{sample\_name} & judul contoh catatan & label hasil pencarian \\
+    \texttt{keywords} & istilah terkait & perluasan atau \textit{boost} query \\
+    \bottomrule
+  \end{tabular}
+  \vspace{0.28cm}
+  \begin{block}{Strategi awal}
+    Indeks satu dokumen per baris MTSamples, dengan \textit{transcription} sebagai field utama dan metadata yang dapat diberi bobot.
+  \end{block}
+  \source{Sumber: struktur \texttt{mtsamples.csv} lokal.}
+\end{frame}
+
+% 8
+\begin{frame}{Arsitektur Memisahkan Data, Indeks, dan Layanan Pencarian}
+  \centering
+  \begin{tikzpicture}[
+    font=\scriptsize,
+    box/.style={rounded corners=3pt,draw=ugmBlueDark,fill=ugmSoft,text width=2.0cm,minimum height=0.98cm,align=center,inner sep=4pt},
+    store/.style={rounded corners=3pt,draw=ugmGold,fill=softGold,text width=2.0cm,minimum height=0.98cm,align=center,inner sep=4pt},
+    arr/.style={-{Stealth[length=1.8mm]},thick,color=ugmBlueDark}]
+    \node[box] (csv) {MTSamples CSV\\transkripsi medis};
+    \node[box,right=0.33cm of csv] (prep) {Preprocessing\\dan normalisasi};
+    \node[store,right=0.33cm of prep] (idx) {BM25 / Lucene\\inverted index};
+    \node[box,right=0.33cm of idx] (api) {REST API\\\texttt{/ir/search}};
+    \node[box,right=0.33cm of api] (ui) {OpenMRS\\UI pencarian};
+    \draw[arr] (csv)--(prep); \draw[arr] (prep)--(idx); \draw[arr] (idx)--(api); \draw[arr] (api)--(ui);
+  \end{tikzpicture}
+  \vspace{0.55cm}
+  \begin{columns}[T,onlytextwidth]
+    \column{0.30\textwidth}
+    \begin{block}{1. Bentuk dokumen}
+      Gunakan transkripsi medis sebagai dokumen utama yang dapat dicari.
+    \end{block}
+    \column{0.30\textwidth}
+    \begin{block}{2. Bangun indeks}
+      Bersihkan teks, hitung statistik koleksi, dan simpan inverted index.
+    \end{block}
+    \column{0.30\textwidth}
+    \begin{block}{3. Layani query}
+      Terapkan preprocessing yang sama, ranking BM25, dan kembalikan JSON.
+    \end{block}
+  \end{columns}
+\end{frame}
+
+% 9
+\begin{frame}{BM25 Memberi Skor Berdasarkan Istilah dan Panjang Dokumen}
+  \begin{block}{Fungsi skor}
+    \centering
+    \small
+    $\displaystyle score(D,Q)=\sum_{q_i\in Q}IDF(q_i)\cdot\frac{TF(q_i,D)\cdot(k_1+1)}{TF(q_i,D)+k_1\cdot(1-b+b\cdot |D|/avgdl)}$
+  \end{block}
+  \vspace{0.25cm}
+  \begin{columns}[T,onlytextwidth]
+    \column{0.31\textwidth}
+    \begin{block}{TF}
+      \textit{Term frequency} menilai kemunculan istilah query di dalam dokumen.
+    \end{block}
+    \column{0.31\textwidth}
+    \begin{block}{IDF}
+      \textit{Inverse document frequency} menaikkan bobot istilah yang jarang.
+    \end{block}
+    \column{0.31\textwidth}
+    \begin{block}{Normalisasi panjang}
+      Parameter $b$ membantu agar dokumen panjang tidak otomatis unggul.
+    \end{block}
+  \end{columns}
+  \vspace{0.25cm}
+  \begin{center}
+    \keyword{Parameter yang diuji:} $k_1$ dan $b$ \qquad \keyword{Baseline:} TF-IDF
+  \end{center}
+  \source{Sumber: Robertson \& Zaragoza (2009).}
+\end{frame}
+
+% 10
+\begin{frame}{Query Klinis Mengembalikan Rekam yang Relevan, Bukan Hanya Cocok}
+  \begin{block}{Contoh query}
+    \centering \texttt{diabetes hypertension medication}
+  \end{block}
+  \vspace{0.18cm}
+  \renewcommand{\arraystretch}{1.3}
+  \begin{tabular}{p{0.08\textwidth}p{0.27\textwidth}p{0.52\textwidth}}
+    \toprule
+    \textbf{Rank} & \textbf{Dokumen} & \textbf{Ringkasan hasil} \\
+    \midrule
+    1 & Patient/Encounter A & Diabetes mellitus; hypertension; metformin \\
+    2 & Patient/Encounter B & Hypertension; glucose monitoring; lifestyle plan \\
+    3 & Patient/Encounter C & Diabetes follow-up; insulin; HbA1c observation \\
+    \bottomrule
+  \end{tabular}
+  \vspace{0.42cm}
+  \begin{center}
+    \color{successGreen}\textbf{GET} \quad \texttt{/ws/rest/v1/ir/search?q=\{keyword\}\&limit=\{k\}}
+  \end{center}
+  \source{Contoh hasil bersifat ilustratif.}
+\end{frame}
+
+% 11
+\sectionframe{Evaluasi dan Rencana Kerja}
+
+% 12
+\begin{frame}{Evaluasi Mengukur Relevansi Ranking dan Respons Sistem}
+  \scriptsize
+  \renewcommand{\arraystretch}{1.25}
+  \begin{tabular}{p{0.20\textwidth}p{0.51\textwidth}p{0.14\textwidth}}
+    \toprule
+    \textbf{Metrik} & \textbf{Definisi} & \textbf{Target awal} \\
+    \midrule
+    Precision@K & Proporsi dokumen relevan dari $K$ hasil teratas & $\geq 0{,}70$ \\
+    Recall@K & Proporsi dokumen relevan yang berhasil ditemukan & $\geq 0{,}60$ \\
+    nDCG@K & Kualitas ranking yang memperhitungkan posisi hasil & $\geq 0{,}65$ \\
+    Mean Response Time & Waktu rata-rata sistem memberikan respons query & $< 2$ detik \\
+    \bottomrule
+  \end{tabular}
+  \vspace{0.3cm}
+  \begin{block}{Rancangan uji}
+    Bangun \textit{query set} dan \textit{relevance judgment}; tuning $k_1$ dan $b$; lalu bandingkan BM25 dengan baseline TF-IDF pada korpus MTSamples.
+  \end{block}
+\end{frame}
+
+% 13
+\begin{frame}{Batasan Menjaga Prototipe Tetap Terukur dan Aman}
+  \begin{columns}[T,onlytextwidth]
+    \small
+    \column{0.43\textwidth}
+    \begin{block}{Platform dan algoritma}
+      \begin{itemize}
+        \item OpenMRS Reference Application.
+        \item BM25 dengan baseline TF-IDF.
+        \item Tidak mencakup \textit{neural retrieval} atau \textit{embedding-based search}.
+      \end{itemize}
+    \end{block}
+    \vspace{0.06cm}
+    \begin{block}{Dokumen dan integrasi}
+      \small
+      \begin{itemize}
+        \item Korpus berupa transkripsi medis naratif MTSamples.
+        \item REST API tanpa mengubah skema basis data inti.
+      \end{itemize}
+    \end{block}
+    \column{0.08\textwidth}
+    \column{0.43\textwidth}
+    \begin{block}{Data}
+      \begin{itemize}
+        \item MTSamples: 4.999 contoh transkripsi medis.
+        \item Tanpa relasi pasien atau \textit{encounter}.
+        \item Tidak digunakan untuk keputusan klinis nyata.
+      \end{itemize}
+    \end{block}
+    \vspace{0.06cm}
+    \begin{block}{Validasi}
+      \small
+      \begin{itemize}
+        \item Evaluasi ranking dan respons sistem.
+        \item Tanpa uji klinis pada pasien nyata.
+      \end{itemize}
+    \end{block}
+  \end{columns}
+\end{frame}
+
+% 14
+\begin{frame}{Tujuh Sesi Menghasilkan Jalur dari Data ke Demonstrasi}
+  \centering
+  \begin{tikzpicture}[
+    font=\scriptsize,
+    phase/.style={rounded corners=3pt,draw=ugmBlueMid,fill=ugmSoft,text width=1.56cm,minimum height=1.65cm,align=center,inner sep=4pt},
+    final/.style={rounded corners=3pt,draw=ugmGold,fill=softGold,text width=1.56cm,minimum height=1.65cm,align=center,inner sep=4pt}]
+    \node[phase] (p1) {\textbf{1}\\Setup\\[-2pt]\tiny OpenMRS dan environment};
+    \node[phase,right=0.13cm of p1] (p2) {\textbf{2}\\Data\\[-2pt]\tiny Profil dan preprocessing};
+    \node[phase,right=0.13cm of p2] (p3) {\textbf{3}\\Index\\[-2pt]\tiny BM25 / Lucene};
+    \node[phase,right=0.13cm of p3] (p4) {\textbf{4}\\Query\\[-2pt]\tiny Ranking dan CLI};
+    \node[phase,right=0.13cm of p4] (p5) {\textbf{5}\\Integrasi\\[-2pt]\tiny Modul dan REST API};
+    \node[phase,right=0.13cm of p5] (p6) {\textbf{6}\\Evaluasi\\[-2pt]\tiny Tuning dan baseline};
+    \node[final,right=0.13cm of p6] (p7) {\textbf{7}\\Final\\[-2pt]\tiny Testing, dokumentasi, demo};
+  \end{tikzpicture}
+  \vspace{0.45cm}
+  \begin{block}{Deliverable akhir}
+    Modul OpenMRS yang dapat mencari korpus MTSamples dan laporan evaluasi kualitas ranking.
+  \end{block}
+\end{frame}
+
+% 15
+\begin{quoteframe}[Tahap berikutnya: bentuk korpus, indeks dengan BM25, integrasikan REST API, lalu evaluasi kualitas ranking.]{MTSamples: transkripsi medis untuk prototipe IR klinis.}
+\end{quoteframe}
+
+\end{document}

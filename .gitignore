@@ -1,0 +1,36 @@
+# OS
+.DS_Store
+
+# Local Claude Code state
+.claude/
+
+# Large / regenerable dataset (download separately, see dataset/README.md)
+dataset/
+
+# Cloned upstream repo used only to run OpenMRS locally via Docker (has its own git history)
+openmrs-distro-referenceapplication/
+
+# Build artifacts
+presentasi-synthea/build/
+output/*.pptx
+target/
+*.class
+
+# Maven module build output
+**/target/
+**/omod/target/
+
+# IDE
+.idea/
+*.iml
+.vscode/
+
+# LaTeX build artifacts
+presentasi-synthea/*.aux
+presentasi-synthea/*.fdb_latexmk
+presentasi-synthea/*.fls
+presentasi-synthea/*.log
+presentasi-synthea/*.out
+presentasi-synthea/*.toc
+presentasi-synthea/*.nav
+presentasi-synthea/*.snm

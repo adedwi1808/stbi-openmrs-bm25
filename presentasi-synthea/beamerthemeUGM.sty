@@ -1,0 +1,210 @@
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{beamerthemeUGM}[2026/06/14 UGM-inspired Beamer theme]
+
+\RequirePackage{etoolbox}
+\RequirePackage{tikz}
+\RequirePackage{graphicx}
+\RequirePackage{xcolor}
+\RequirePackage{fontspec}
+\RequirePackage[absolute,overlay]{textpos}
+
+\mode<presentation>
+
+\definecolor{ugmBlue}{HTML}{0F4C81}
+\definecolor{ugmBlueDark}{HTML}{08375D}
+\definecolor{ugmBlueMid}{HTML}{4F6473}
+\definecolor{ugmGold}{HTML}{F4C300}
+\definecolor{ugmText}{HTML}{143042}
+\definecolor{ugmSoft}{HTML}{EFF4F7}
+
+\IfFileExists{font/Gama-Sans-Regular.otf}{
+  \setsansfont{Gama-Sans-Regular.otf}[
+    Path=font/,
+    BoldFont=Gama-Sans-Bold.otf,
+    ItalicFont=Gama-Sans-Light-Italic.otf,
+    BoldItalicFont=Gama-Sans-Bold-Italic.otf
+  ]
+}{
+\IfFileExists{../resource/font/Gama-Sans-Regular.otf}{
+  \setsansfont{Gama-Sans-Regular.otf}[
+    Path=../resource/font/,
+    BoldFont=Gama-Sans-Bold.otf,
+    ItalicFont=Gama-Sans-Light-Italic.otf,
+    BoldItalicFont=Gama-Sans-Bold-Italic.otf
+  ]
+}{
+  \IfFileExists{../../resource/font/Gama-Sans-Regular.otf}{
+    \setsansfont{Gama-Sans-Regular.otf}[
+      Path=../../resource/font/,
+      BoldFont=Gama-Sans-Bold.otf,
+      ItalicFont=Gama-Sans-Light-Italic.otf,
+      BoldItalicFont=Gama-Sans-Bold-Italic.otf
+    ]
+  }{
+    \IfFontExistsTF{Gama Sans}{
+      \setsansfont{Gama Sans}[
+        BoldFont=* Bold,
+        ItalicFont=* Light Italic
+      ]
+    }{
+      \setsansfont{TeX Gyre Heros}[
+        BoldFont=* Bold,
+        ItalicFont=* Italic
+      ]
+    }
+  }
+}
+}
+\renewcommand{\familydefault}{\sfdefault}
+
+\usefonttheme{professionalfonts}
+\setbeamertemplate{navigation symbols}{}
+\setbeamertemplate{blocks}[rounded][shadow=false]
+\setbeamersize{text margin left=10mm,text margin right=10mm}
+
+\setbeamercolor{normal text}{fg=ugmText,bg=white}
+\setbeamercolor{structure}{fg=ugmBlue}
+\setbeamercolor{frametitle}{fg=ugmBlueDark,bg=white}
+\setbeamercolor{title}{fg=ugmBlueDark}
+\setbeamercolor{subtitle}{fg=ugmText}
+\setbeamercolor{author}{fg=ugmText}
+\setbeamercolor{date}{fg=ugmText}
+\setbeamercolor{section title}{fg=ugmBlueDark,bg=white}
+\setbeamercolor{block title}{fg=white,bg=ugmBlueDark}
+\setbeamercolor{block body}{fg=ugmText,bg=ugmSoft}
+\setbeamercolor{itemize item}{fg=ugmBlue}
+\setbeamercolor{itemize subitem}{fg=ugmGold}
+
+\setbeamerfont{title}{series=\bfseries,size=\fontsize{21}{25}}
+\setbeamerfont{subtitle}{size=\fontsize{10}{13}}
+\setbeamerfont{author}{series=\bfseries,size=\fontsize{9}{11}}
+\setbeamerfont{date}{size=\fontsize{8}{10}}
+\setbeamerfont{frametitle}{series=\bfseries,size=\fontsize{15}{17}}
+\setbeamerfont{framesubtitle}{size=\fontsize{9}{11}}
+\setbeamerfont{section title}{series=\bfseries,size=\fontsize{22}{26}}
+\setbeamerfont{block title}{series=\bfseries}
+
+\newcommand{\ugmwordmark}{assets/ugm-wordmark.png}
+\newcommand{\ugmcoverimage}{assets/ugm-cover-sketch-opt2.jpeg}
+\newcommand{\ugmsectionimage}{assets/ugm-building-photo-opt2.jpeg}
+\newcommand{\ugmquoteimage}{assets/ugm-figure-sketch-opt2.png}
+\newcommand{\ugmwebsite}{ugm.ac.id}
+\newcommand{\ugmcoverdesc}{}
+\newcommand{\setugmwordmark}[1]{\renewcommand{\ugmwordmark}{#1}}
+\newcommand{\setugmcoverimage}[1]{\renewcommand{\ugmcoverimage}{#1}}
+\newcommand{\setugmsectionimage}[1]{\renewcommand{\ugmsectionimage}{#1}}
+\newcommand{\setugmquoteimage}[1]{\renewcommand{\ugmquoteimage}{#1}}
+\newcommand{\setugmwebsite}[1]{\renewcommand{\ugmwebsite}{#1}}
+\newcommand{\setugmcoverdesc}[1]{\renewcommand{\ugmcoverdesc}{#1}}
+
+\newcommand{\UGMWordmark}{%
+  \includegraphics[width=3.1cm]{\ugmwordmark}%
+}
+
+\newcommand{\UGMRightBars}{%
+  \begin{tikzpicture}[remember picture,overlay]
+    \fill[ugmGold] ([xshift=-0.44cm]current page.north east) rectangle ([yshift=-0.58\paperheight]current page.north east);
+    \fill[ugmBlueDark] ([xshift=-0.44cm,yshift=-0.58\paperheight]current page.north east) rectangle (current page.south east);
+  \end{tikzpicture}
+}
+
+\setbeamertemplate{title page}{%
+  \begin{tikzpicture}[remember picture,overlay]
+    \fill[white] (current page.south west) rectangle (current page.north east);
+    \begin{scope}
+      \clip (current page.south west) rectangle ([xshift=-0.44cm]current page.north east);
+      \node[anchor=south west,inner sep=0,opacity=0.86] at ([xshift=-0.20cm,yshift=-0.40cm]current page.south west) {\includegraphics[height=1\paperheight]{\ugmcoverimage}};
+      \fill[white,opacity=0.48] (current page.south west) rectangle (current page.north east);
+    \end{scope}
+    \fill[ugmGold] ([xshift=4.85cm,yshift=-1.48cm]current page.south west) circle [radius=2.95cm];
+    \node[anchor=north west] at ([xshift=0.48cm,yshift=-0.42cm]current page.north west) {\includegraphics[width=3.5cm]{\ugmwordmark}};
+    \node[anchor=north west,text width=8.5cm] at ([xshift=7.55cm,yshift=-2.10cm]current page.north west) {%
+      {\raggedright\fontsize{18.0}{19}\selectfont\bfseries\color{ugmBlueDark}\inserttitle\par}
+      \vspace{0.22cm}
+      {\color{ugmGold}\rule{2.18cm}{3.2pt}\par}
+      \vspace{0.24cm}
+      \ifstrempty{\ugmcoverdesc}{}{{\fontsize{7.7}{9.4}\selectfont\bfseries\color{ugmBlue}\MakeUppercase{\ugmcoverdesc}\par\vspace{0.28cm}}}
+      \begin{minipage}{8.45cm}
+        \raggedright
+        {\fontsize{7.0}{8.5}\selectfont\color{ugmBlueMid}\insertauthor\par}
+        {\fontsize{7.0}{8.5}\selectfont\color{ugmBlueMid}\insertinstitute\par}
+      \end{minipage}
+    };
+    \node[anchor=south west,font=\fontsize{8}{10}\selectfont\color{ugmBlueDark},text width=3cm,align=left] at ([xshift=0.56cm,yshift=0.38cm]current page.south west) {\texttt{\ugmwebsite}};
+    \node[anchor=south east,align=right,font=\fontsize{6.6}{8.9}\selectfont\bfseries\itshape,text=ugmBlueDark] at ([xshift=-0.78cm,yshift=0.33cm]current page.south east) {Merakyat, Mandiri, Berkelanjutan\\Inclusive, Self-Reliant, Sustainable};
+  \end{tikzpicture}
+  \UGMRightBars
+}
+
+\setbeamertemplate{frametitle}{%
+  \vspace*{0.42cm}
+  \begin{beamercolorbox}[wd=\paperwidth,leftskip=0.68cm,rightskip=5.2cm,sep=0pt]{frametitle}
+    \usebeamerfont{frametitle}\insertframetitle\par
+    \ifx\insertframesubtitle\@empty\relax
+    \else
+      \vspace{0.08cm}
+      {\usebeamerfont{framesubtitle}\color{ugmBlueMid}\insertframesubtitle\par}
+    \fi
+  \end{beamercolorbox}
+}
+
+\setbeamertemplate{footline}{%
+  \begin{tikzpicture}[remember picture,overlay]
+    \node[anchor=north east,inner sep=0,opacity=0.68] at ([xshift=-0.48cm,yshift=-0.30cm]current page.north east) {%
+      \includegraphics[width=2.8cm]{\ugmwordmark}
+    };
+    \fill[ugmBlueDark!86] ([xshift=0.45cm,yshift=0.68cm]current page.south west) rectangle ([xshift=-0.45cm,yshift=0.715cm]current page.south east);
+    \node[anchor=south,font=\fontsize{8.2}{10}\selectfont\itshape\bfseries,text=ugmBlueDark] at ([yshift=0.20cm]current page.south) {Merakyat, Mandiri, Berkelanjutan | Inclusive, Self-Reliant, Sustainable};
+  \end{tikzpicture}%
+}
+
+\newcommand{\sectionframe}[1]{%
+  {
+    \setbeamertemplate{footline}{}
+    \begin{frame}[plain]
+      \begin{tikzpicture}[remember picture,overlay]
+        \fill[white] (current page.south west) rectangle (current page.north east);
+        \begin{scope}
+          \clip (current page.south west) rectangle ([xshift=0.29\paperwidth]current page.north west);
+          \node[anchor=south west,inner sep=0] at ([xshift=-1.55cm]current page.south west) {\includegraphics[height=\paperheight]{\ugmsectionimage}};
+        \end{scope}
+        \fill[white] ([xshift=0.29\paperwidth]current page.south west) rectangle (current page.north east);
+        \node[anchor=north east,inner sep=0,opacity=0.78] at ([xshift=-0.52cm,yshift=-0.34cm]current page.north east) {\includegraphics[width=3.0cm]{\ugmwordmark}};
+        \fill[ugmGold] (current page.south west) rectangle ([xshift=0.29\paperwidth,yshift=1.72cm]current page.south west);
+        \fill[ugmBlueDark] ([xshift=0.29\paperwidth]current page.south west) rectangle ([yshift=1.72cm]current page.south east);
+        \node[anchor=center,font=\fontsize{8}{10}\selectfont\bfseries\color{ugmBlueDark}] at ([xshift=0.145\paperwidth,yshift=0.86cm]current page.south west) {\texttt{\ugmwebsite}};
+        \node[anchor=center,font=\fontsize{8}{10}\selectfont\bfseries\itshape\color{white},align=center] at ([xshift=0.645\paperwidth,yshift=0.86cm]current page.south west) {Merakyat, Mandiri, Berkelanjutan | Inclusive, Self-Reliant, Sustainable};
+      \end{tikzpicture}
+      \vspace{2.42cm}
+      \hspace*{4.85cm}
+      \begin{minipage}{0.52\paperwidth}
+        {\usebeamerfont{section title}\color{ugmBlueDark}#1\par}
+      \end{minipage}
+    \end{frame}
+  }
+}
+
+\newenvironment{quoteframe}[2][]{%
+  \setbeamertemplate{footline}{}
+  \begin{frame}[plain]
+  \begin{tikzpicture}[remember picture,overlay]
+    \fill[white] (current page.south west) rectangle (current page.north east);
+    \node[anchor=south east,inner sep=0,opacity=0.72] at (current page.south east) {\includegraphics[width=\paperwidth,height=\paperheight]{\ugmquoteimage}};
+    \node[anchor=north west,inner sep=0] at ([xshift=0.62cm,yshift=-0.45cm]current page.north west) {\includegraphics[width=5.85cm]{\ugmwordmark}};
+    \node[anchor=north west,text width=6.9cm] at ([xshift=0.95cm,yshift=-2.55cm]current page.north west) {%
+      {\fontsize{15.2}{21.8}\selectfont\itshape\color{black!92}#2\par}
+      \ifstrempty{#1}{}{\vspace{0.36cm}{\fontsize{8.8}{12.5}\selectfont\color{ugmText}#1\par}}
+    };
+    \node[anchor=south west,align=left,font=\fontsize{8.8}{11}\selectfont\bfseries\itshape,text=ugmBlueDark] at ([xshift=0.66cm,yshift=0.48cm]current page.south west) {Merakyat, Mandiri, Berkelanjutan\\Inclusive, Self-Reliant, Sustainable};
+    \node[anchor=south east,font=\fontsize{9.2}{11}\selectfont\color{ugmBlueDark}] at ([xshift=-1.05cm,yshift=0.48cm]current page.south east) {\texttt{\ugmwebsite}};
+  \end{tikzpicture}
+  \UGMRightBars
+}{%
+  \end{frame}
+}
+
+\AtBeginSection[]{
+  \sectionframe{\insertsectionhead}
+}
+
+\endinput
