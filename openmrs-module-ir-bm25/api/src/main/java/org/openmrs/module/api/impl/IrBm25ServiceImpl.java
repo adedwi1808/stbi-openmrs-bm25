@@ -9,44 +9,91 @@
  */
 package org.openmrs.module.api.impl;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.Arrays;
+import java.util.List;
+
 import org.openmrs.api.APIException;
-import org.openmrs.api.UserService;
 import org.openmrs.api.impl.BaseOpenmrsService;
-import org.openmrs.module.Item;
 import org.openmrs.module.api.IrBm25Service;
-import org.openmrs.module.api.dao.IrBm25Dao;
+import org.openmrs.module.irbm25.ClinicalLexicon;
+import org.openmrs.module.irbm25.ClinicalNormalizer;
+import org.openmrs.module.irbm25.IrSearchResult;
+import org.openmrs.module.irbm25.SearchVariant;
+import org.openmrs.module.irbm25.search.IrIndexer;
+import org.openmrs.module.irbm25.search.IrSearcher;
 
 public class IrBm25ServiceImpl extends BaseOpenmrsService implements IrBm25Service {
 	
-	IrBm25Dao dao;
+	private volatile ClinicalNormalizer normalizer;
 	
-	UserService userService;
+	private volatile String indexDirPath;
 	
-	/**
-	 * Injected in moduleApplicationContext.xml
-	 */
-	public void setDao(IrBm25Dao dao) {
-		this.dao = dao;
-	}
-	
-	/**
-	 * Injected in moduleApplicationContext.xml
-	 */
-	public void setUserService(UserService userService) {
-		this.userService = userService;
-	}
-	
-	@Override
-	public Item getItemByUuid(String uuid) throws APIException {
-		return dao.getItemByUuid(uuid);
-	}
-	
-	@Override
-	public Item saveItem(Item item) throws APIException {
-		if (item.getOwner() == null) {
-			item.setOwner(userService.getUser(1));
+	private ClinicalNormalizer normalizer() {
+		if (normalizer == null) {
+			synchronized (this) {
+				if (normalizer == null) {
+					try {
+						normalizer = new ClinicalNormalizer(new ClinicalLexicon());
+					}
+					catch (IOException e) {
+						throw new APIException("ir-bm25: failed to load clinical lexicon", e);
+					}
+				}
+			}
 		}
-		
-		return dao.saveItem(item);
+		return normalizer;
+	}
+	
+	@Override
+	public int buildIndex(String corpusJsonlPath, String indexDirPath) throws APIException {
+		try {
+			int n = new IrIndexer(normalizer()).buildIndex(Paths.get(corpusJsonlPath), Paths.get(indexDirPath));
+			this.indexDirPath = indexDirPath;
+			return n;
+		}
+		catch (IOException e) {
+			throw new APIException("ir-bm25: failed to build index from " + corpusJsonlPath, e);
+		}
+	}
+	
+	@Override
+	public List<IrSearchResult> search(String query, String variantId, int limit) throws APIException {
+		if (!isIndexReady()) {
+			throw new APIException("ir-bm25: index not ready (indexDirPath=" + indexDirPath
+			        + "). Call buildIndex first.");
+		}
+		SearchVariant variant = SearchVariant.fromId(variantId);
+		if (variant == null) {
+			variant = SearchVariant.CLINICAL_EXPANDED;
+		}
+		try (IrSearcher searcher = new IrSearcher(Paths.get(indexDirPath), normalizer())) {
+			return searcher.search(query, variant, limit);
+		}
+		catch (IOException e) {
+			throw new APIException("ir-bm25: search failed for query '" + query + "'", e);
+		}
+	}
+	
+	@Override
+	public List<SearchVariant> getSearchVariants() {
+		return Arrays.asList(SearchVariant.values());
+	}
+	
+	@Override
+	public String getIndexDirPath() {
+		return indexDirPath;
+	}
+	
+	@Override
+	public void setIndexDirPath(String indexDirPath) {
+		this.indexDirPath = indexDirPath;
+	}
+	
+	@Override
+	public boolean isIndexReady() {
+		return indexDirPath != null && Files.isDirectory(Paths.get(indexDirPath));
 	}
 }

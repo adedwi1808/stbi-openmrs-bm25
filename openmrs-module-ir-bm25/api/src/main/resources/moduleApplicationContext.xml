@@ -25,17 +25,14 @@
 
     <context:component-scan base-package="org.openmrs.module" />
 
-    <!-- Wraps IrBm25Service methods in DB transactions and OpenMRS interceptors,
-    which set audit info like dateCreated, changedBy, etc.-->
+    <!-- Wraps IrBm25Service methods in DB transactions and OpenMRS interceptors. -->
     <bean id="ir-bm25.IrBm25Service"
             class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
         <property name="transactionManager">
             <ref bean="transactionManager" />
         </property>
         <property name="target">
-            <bean class="org.openmrs.module.api.impl.IrBm25ServiceImpl">
-                <property name="dao" ref="ir-bm25.IrBm25Dao" />
-            </bean>
+            <bean class="org.openmrs.module.api.impl.IrBm25ServiceImpl" />
         </property>
         <property name="preInterceptors">
             <ref bean="serviceInterceptors" />

@@ -9,28 +9,47 @@
  */
 package org.openmrs.module;
 
+import java.io.File;
+
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.openmrs.module.BaseModuleActivator;
+import org.openmrs.api.context.Context;
+import org.openmrs.module.api.IrBm25Service;
+import org.openmrs.util.OpenmrsUtil;
 
 /**
- * This class contains the logic that is run every time this module is either started or shutdown
+ * Builds the BM25 index on module startup when the {@code irbm25.corpusPath} global property is
+ * configured, so the search UI is usable out of the box.
  */
 public class IrBm25Activator extends BaseModuleActivator {
 	
 	private Log log = LogFactory.getLog(this.getClass());
 	
-	/**
-	 * @see #started()
-	 */
+	@Override
 	public void started() {
 		log.info("Started IR BM25");
+		try {
+			String corpusPath = Context.getAdministrationService().getGlobalProperty("irbm25.corpusPath");
+			if (StringUtils.isBlank(corpusPath)) {
+				log.info("irbm25.corpusPath not set; skipping index build");
+				return;
+			}
+			String indexDir = Context.getAdministrationService().getGlobalProperty("irbm25.indexDir");
+			if (StringUtils.isBlank(indexDir)) {
+				indexDir = OpenmrsUtil.getApplicationDataDirectory() + File.separator + "irbm25" + File.separator + "index";
+			}
+			IrBm25Service service = Context.getService(IrBm25Service.class);
+			int n = service.buildIndex(corpusPath, indexDir);
+			log.info("IR BM25 index built: " + n + " documents -> " + indexDir);
+		}
+		catch (Exception e) {
+			log.warn("IR BM25 index not built at startup: " + e.getMessage(), e);
+		}
 	}
 	
-	/**
-	 * @see #shutdown()
-	 */
-	public void shutdown() {
+	@Override
+	public void stopped() {
 		log.info("Shutdown IR BM25");
 	}
 	

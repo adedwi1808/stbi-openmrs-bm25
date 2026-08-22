@@ -9,40 +9,46 @@
  */
 package org.openmrs.module.api;
 
-import org.openmrs.annotation.Authorized;
+import java.util.List;
+
 import org.openmrs.api.APIException;
 import org.openmrs.api.OpenmrsService;
-import org.openmrs.module.IrBm25Config;
-import org.openmrs.module.Item;
-import org.springframework.transaction.annotation.Transactional;
+import org.openmrs.module.irbm25.IrSearchResult;
+import org.openmrs.module.irbm25.SearchVariant;
 
 /**
- * The main service of this module, which is exposed for other modules. See
- * moduleApplicationContext.xml on how it is wired up.
+ * The main service of this module: builds the BM25 index from a clinical-text corpus and runs
+ * ranked retrieval against it using one of the supported {@link SearchVariant} strategies.
  */
 public interface IrBm25Service extends OpenmrsService {
 	
 	/**
-	 * Returns an item by uuid. It can be called by any authenticated user. It is fetched in read
-	 * only transaction.
+	 * Builds the multi-field Lucene index from a corpus JSONL file.
 	 * 
-	 * @param uuid
-	 * @return
-	 * @throws APIException
+	 * @param corpusJsonlPath path to a {@code corpus.jsonl} file (one JSON object per line)
+	 * @param indexDirPath directory to write the Lucene index into
+	 * @return the number of documents indexed
 	 */
-	@Authorized()
-	@Transactional(readOnly = true)
-	Item getItemByUuid(String uuid) throws APIException;
+	int buildIndex(String corpusJsonlPath, String indexDirPath) throws APIException;
 	
 	/**
-	 * Saves an item. Sets the owner to superuser, if it is not set. It can be called by users with
-	 * this module's privilege. It is executed in a transaction.
+	 * Runs ranked BM25 retrieval for a query using the given variant.
 	 * 
-	 * @param item
-	 * @return
-	 * @throws APIException
+	 * @param query the free-text query
+	 * @param variantId one of "v0".."v4" (see {@link SearchVariant#fromId(String)})
+	 * @param limit maximum number of results
+	 * @return the ranked results
 	 */
-	@Authorized(IrBm25Config.MODULE_PRIVILEGE)
-	@Transactional
-	Item saveItem(Item item) throws APIException;
+	List<IrSearchResult> search(String query, String variantId, int limit) throws APIException;
+	
+	/** All search variants available in the UI dropdown. */
+	List<SearchVariant> getSearchVariants();
+	
+	/** The directory holding the built index (or null if not yet built). */
+	String getIndexDirPath();
+	
+	void setIndexDirPath(String indexDirPath);
+	
+	/** True if the index directory exists and can be opened. */
+	boolean isIndexReady();
 }
