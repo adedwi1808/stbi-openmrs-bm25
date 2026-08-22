@@ -25,6 +25,11 @@
 		<class>org.openmrs.module.extension.html.AdminList</class>
 	</extension>
 
+	<extension>
+		<point>org.openmrs.gutter.tools</point>
+		<class>org.openmrs.module.extension.html.GutterList</class>
+	</extension>
+
 	<aware_of_modules>
 		<aware_of_module>org.openmrs.module.legacyui</aware_of_module>
 	</aware_of_modules>
@@ -46,17 +51,24 @@
 	 /Required Privileges -->
 
 
-	<!-- Required Global Properties 
+	<!-- Required Global Properties -->
 	<globalProperty>
-		<property>@MODULE_ID@.someProperty</property>
+		<property>irbm25.corpusPath</property>
 		<defaultValue></defaultValue>
 		<description>
-			A description of the global property goes here.  The description
-			should explain enough for administrators to understand the purpose
-			and possible values for the global property.
+			Absolute path to the corpus.jsonl file used to build the BM25 index.
+			Leave blank to skip index building at module startup.
 		</description>
 	</globalProperty>
-	/Required Global Properties -->
+	<globalProperty>
+		<property>irbm25.indexDir</property>
+		<defaultValue></defaultValue>
+		<description>
+			Directory to store the Lucene index. Defaults to the application data
+			directory under irbm25/index when left blank.
+		</description>
+	</globalProperty>
+	<!-- /Required Global Properties -->
 	
 	<!--
 	<dwr>
