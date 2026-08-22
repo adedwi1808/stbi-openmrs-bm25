@@ -31,3 +31,16 @@ presentasi-synthea/*.out
 presentasi-synthea/*.toc
 presentasi-synthea/*.nav
 presentasi-synthea/*.snm
+
+# LaTeX build artifacts (generic, across laporan/ and presentasi/)
+*.aux
+*.bbl
+*.blg
+*.fdb_latexmk
+*.fls
+*.out
+*.xdv
+*.toc
+*.nav
+*.snm
+*.log
