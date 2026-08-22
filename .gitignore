@@ -44,3 +44,6 @@ presentasi-synthea/*.snm
 *.nav
 *.snm
 *.log
+
+# Local LaTeX compile output
+presentasi/main.pdf
