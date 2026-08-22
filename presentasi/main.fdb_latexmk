@@ -1,10 +1,10 @@
 # Fdb version 4
-["xdvipdfmx"] 1787372812.33742 "main.xdv" "main.pdf" "main" 1787372829.60068 0
-  "main.xdv" 1787372812.25176 281180 e6a8a4c79b6a9783e2138322b547176a "xelatex"
+["xdvipdfmx"] 1787374102.21804 "main.xdv" "main.pdf" "main" 1787374116.93787 0
+  "main.xdv" 1787374102.13532 207016 b40f2b96bc9d930f1239db8f252055fa "xelatex"
   (generated)
   "main.pdf"
   (rewritten before read)
-["xelatex"] 1787372810.67992 "main.tex" "main.xdv" "main" 1787372829.5959 0
+["xelatex"] 1787374100.76652 "main.tex" "main.xdv" "main" 1787374116.93609 0
   "/usr/local/texlive/2026/texmf-dist/fonts/map/fontname/texfonts.map" 1577235249 3524 cb3e574dea2d1052e39280babc910dc8 ""
   "/usr/local/texlive/2026/texmf-dist/fonts/tfm/adobe/zapfding/pzdr.tfm" 1136768653 1528 f853c4d1b4e0550255e02831fdc8496f ""
   "/usr/local/texlive/2026/texmf-dist/fonts/tfm/public/amsfonts/cmextra/cmex7.tfm" 1246382020 1004 54797486969f23fa377b128694d548df ""
@@ -208,10 +208,10 @@
   "assets/ugm-wordmark.png" 1786157750 397541 7876d85cd9c33a1f70a3902c33e97f3f ""
   "beamerthemeUGM.sty" 1786158691 9866 8a7ac63ef14fa69d354d69d3c2c7537a ""
   "font/Gama-Sans-Regular.otf" 1786157884 14924 17f7556c57f0782af05e2e9e1c86ad70 ""
-  "main.aux" 1787372812.25048 4326 bb07d1291a2d4f9d28c08f0d9ef1c1cd "xelatex"
-  "main.nav" 1787372812.2517 1946 cc1d57bc897673374b837eab8153475a "xelatex"
-  "main.out" 1787372811.47388 0 d41d8cd98f00b204e9800998ecf8427e "xelatex"
-  "main.tex" 1787372680.24228 17790 fbca1bc29c328ac9aa4251b5dea5f9ee ""
+  "main.aux" 1787374102.13417 3514 6d4fe9760b01e1b75f04a122746d3125 "xelatex"
+  "main.nav" 1787374102.13511 1574 f5abf7444d939a8c2cd188b6df8c9c87 "xelatex"
+  "main.out" 1787374101.59517 0 d41d8cd98f00b204e9800998ecf8427e "xelatex"
+  "main.tex" 1787374096.19149 13748 4bcc925609d52bfc18d7d3f3aef3c8ea ""
   (generated)
   "main.aux"
   "main.log"
