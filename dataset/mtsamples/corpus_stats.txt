@@ -1,0 +1,50 @@
+MTSamples corpus build report
+========================================
+input file:              dataset/mtsamples/mtsamples.csv
+output file:             dataset/mtsamples/corpus.jsonl
+min_tokens threshold:    50
+
+input rows (excl. header): 4999
+dropped, by reason (applied in order):
+  1. empty/whitespace-only transcription: 33
+     -> non-empty transcriptions:          4966
+  2. exact-duplicate transcription rows:  2609  (collapsed into 2357 distinct transcriptions)
+  3. distinct transcription < 50 tokens:    41
+  total dropped:                          2683
+
+final document count: 2316
+
+transcription length (characters):
+  avg: 3026.0
+  min: 316
+  max: 18422
+
+transcription length (whitespace-split tokens):
+  avg: 466.1
+  min: 52
+  max: 3029
+
+duplicate-group merge:
+  documents formed from >1 raw row (n_variants > 1): 2113 (91.2%)
+  largest merged group (max n_variants):       5
+
+documents carrying >1 specialty in medical_specialties: 2113 (91.2%)
+  NOTE: medical_specialty is multi-label data (mtsamples.com republishes the same transcription under multiple specialty categories). It is therefore UNSUITABLE as a pseudo-relevance label for retrieval evaluation -- treating it as a single ground-truth category would misjudge otherwise-correct results as irrelevant.
+
+keyword coverage (docs with a non-null `keywords` value):
+  before merging (first occurrence only): 1790 (77.3%)
+  after merging (union across duplicates): 1790 (77.3%)
+  NOTE: in this dataset the null/non-null coverage figure does NOT change (77.3% -> 77.3%). Across all 2,357 distinct transcriptions there is exactly one group where the first occurrence's keywords are empty but a later duplicate's are not -- and that one group is itself dropped by the < 50-token filter, so it never reaches the final corpus. Merging's real benefit here is TERM-level, not doc-level coverage: of the docs that already had non-null keywords, 1609 (89.9%) gained additional keyword terms from their duplicate siblings that the old first-occurrence-only logic silently discarded.
+
+distinct medical_specialty (primary) values: 39
+top-10 medical_specialty (primary) distribution:
+  Surgery                          966  (41.7%)
+  Radiology                        242  (10.4%)
+  General Medicine                 156  ( 6.7%)
+  Urology                          153  ( 6.6%)
+  SOAP / Chart / Progress Notes    142  ( 6.1%)
+  Neurology                         67  ( 2.9%)
+  Consult - History and Phy.        54  ( 2.3%)
+  Pediatrics - Neonatal             52  ( 2.2%)
+  Orthopedic                        52  ( 2.2%)
+  Psychiatry / Psychology           49  ( 2.1%)

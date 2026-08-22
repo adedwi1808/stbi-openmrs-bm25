@@ -4,9 +4,6 @@
 # Local Claude Code state
 .claude/
 
-# Large / regenerable dataset (download separately, see dataset/README.md)
-dataset/
-
 # Cloned upstream repo used only to run OpenMRS locally via Docker (has its own git history)
 openmrs-distro-referenceapplication/
 
