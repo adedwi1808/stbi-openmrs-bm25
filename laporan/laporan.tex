@@ -111,7 +111,7 @@
   Sistem Information Retrieval Berbasis BM25 pada Platform OpenMRS: Normalisasi dan Ekspansi Klinis untuk Pencarian Catatan Medis Teks Bebas
 \end{center}
 \vspace{0.4cm}
-\noindent Pencarian pada Rekam Medis Elektronik (RME) konvensional umumnya terbatas pada pencocokan kata kunci eksak, sehingga gagal menangani sinonim, singkatan, dan variasi terminologi medis pada catatan klinis teks bebas. Proyek ini mengimplementasikan mesin \textit{ranked retrieval} berbasis BM25 dan mengintegrasikannya ke dalam platform open-source OpenMRS sebagai modul tambahan. Kontribusi utamanya bukan sekadar penerapan BM25, melainkan studi ablasi terhadap lapisan \textbf{normalisasi dan ekspansi klinis}: stopword list yang mempertahankan penanda negasi, deteksi istilah majemuk, serta ekspansi singkatan dan sinonim medis. Sistem dievaluasi pada dataset MTSamples yang diproses menjadi 2.316 dokumen final, dengan lima varian retrieval (V0--V4) yang dibandingkan berdampingan. Hasil menunjukkan bahwa normalisasi klinis (V1) meningkatkan nDCG@10 dari 0,6832 menjadi 0,6865 dibanding baseline naif (V0), sementara varian ekspansi menunjukkan \textit{trade-off} presisi yang dilaporkan apa adanya. Modul yang dihasilkan diuji berjalan pada OpenMRS 2.8.8 dengan indeks Apache Lucene 8.11.2 yang di-\textit{shade} untuk menghindari konflik dependensi.
+\noindent Pencarian pada Rekam Medis Elektronik (RME) konvensional umumnya terbatas pada pencocokan kata kunci eksak, sehingga gagal menangani sinonim, singkatan, dan variasi terminologi medis pada catatan klinis teks bebas. Proyek ini mengimplementasikan mesin \textit{ranked retrieval} berbasis BM25 dan mengintegrasikannya ke dalam platform open-source OpenMRS sebagai modul tambahan. Kontribusi utamanya bukan sekadar penerapan BM25, melainkan studi ablasi terhadap lapisan normalisasi dan ekspansi klinis: stopword list yang mempertahankan penanda negasi, deteksi istilah majemuk, serta ekspansi singkatan dan sinonim medis. Sistem dievaluasi pada dataset MTSamples yang diproses menjadi 2.316 dokumen final, dengan lima varian retrieval (V0--V4) yang dibandingkan berdampingan. Hasil menunjukkan bahwa normalisasi klinis (V1) meningkatkan nDCG@10 dari 0,6832 menjadi 0,6865 dibanding baseline naif (V0), sementara varian ekspansi menunjukkan \textit{trade-off} presisi yang dilaporkan apa adanya. Modul yang dihasilkan diuji berjalan pada OpenMRS 2.8.8 dengan indeks Apache Lucene 8.11.2 yang di-\textit{shade} untuk menghindari konflik dependensi.
 
 \clearpage
 
@@ -134,7 +134,14 @@ Namun, kemampuan pencarian pada sistem RME konvensional umumnya terbatas pada pe
 Pencarian informasi medis pada RME lama masih mengandalkan mekanisme pencarian kata kunci eksak yang membatasi efektivitas penemuan kasus klinis. Pendekatan ini gagal menangani variasi terminologi medis, singkatan, dan sinonim, sehingga dokumen relevan yang memakai istilah berbeda tidak dapat ditemukan. Akibatnya, tenaga medis kesulitan mengakses riwayat klinis pasien secara komprehensif, yang berpotensi menghambat kecepatan dan akurasi pengambilan keputusan medis.
 
 \subsection{Batasan}
-Batasan proyek ini adalah: (1) platform yang digunakan adalah OpenMRS Reference Application, bukan pengembangan RME dari nol; (2) algoritma yang diimplementasikan adalah BM25, tidak mencakup pendekatan \textit{neural retrieval}; (3) dataset yang digunakan adalah MTSamples yang memuat sekitar 5.000 transkripsi medis; (4) modul diintegrasikan melalui endpoint HTTP tanpa mengubah skema basis data inti OpenMRS; dan (5) evaluasi dilakukan secara teknis menggunakan metrik IR standar tanpa uji klinis dengan pasien nyata.
+Batasan proyek ini adalah sebagai berikut.
+\begin{enumerate}
+    \item Platform yang digunakan adalah OpenMRS Reference Application, bukan pengembangan RME dari nol.
+    \item Algoritma yang diimplementasikan adalah BM25, tidak mencakup pendekatan \textit{neural retrieval}.
+    \item Dataset yang digunakan adalah MTSamples yang memuat sekitar 5.000 transkripsi medis.
+    \item Modul diintegrasikan melalui endpoint HTTP tanpa mengubah skema basis data inti OpenMRS.
+    \item Evaluasi dilakukan secara teknis menggunakan metrik IR standar tanpa uji klinis dengan pasien nyata.
+\end{enumerate}
 
 \subsection{Tujuan}
 Tujuan proyek ini adalah mengimplementasikan \textit{ranked retrieval} BM25, membangun mekanisme pengindeksan dengan \textit{inverted index}, mengintegrasikan modul pencarian ke ekosistem OpenMRS, dan mengevaluasi kinerjanya dengan metrik Precision@K, Recall@K, dan nDCG@K.
@@ -205,7 +212,7 @@ Sistem terdiri atas tiga komponen utama: pipeline data (Python), mesin IR (Java/
 Dataset dibangun dari \texttt{mtsamples.csv} (4.999 baris) melalui tiga tahap: deduplikasi, normalisasi \textit{whitespace}, dan penyaringan dokumen pendek. Baris duplikat digabung (bukan dibuang) sehingga metadata multi-label dipertahankan. Lexicon klinis dibangun dari empat sumber: penanda negasi, istilah majemuk, singkatan medis, dan sinonim. Query set berisi 50 \textit{query} klinis, dengan \textit{relevance judgment} (qrels) format TREC yang disusun secara semi-otomatis berbasis kolom \texttt{keywords}, \texttt{sample\_name}, dan \texttt{description}, serta sadar-sinonim agar varian ekspansi dinilai setara.
 
 \subsection{Varian Retrieval}
-Seluruh varian memakai parameter BM25 yang sama ($k_1 = 1{,}2$, $b = 0{,}75$); perbedaannya hanya pada lapisan tokenisasi. Tabel~\ref{tab:varian} merangkum kelima varian.
+Seluruh varian memakai parameter BM25 yang sama ($k_1 = 1{,}2$, $b = 0{,}75$). Perbedaannya hanya pada lapisan tokenisasi. Tabel~\ref{tab:varian} merangkum kelima varian.
 
 \begin{table}[h]
   \centering
@@ -223,6 +230,8 @@ Seluruh varian memakai parameter BM25 yang sama ($k_1 = 1{,}2$, $b = 0{,}75$); p
     \bottomrule
   \end{tabular}
 \end{table}
+
+Kelima varian dirancang sebagai \textit{ablation study}, bukan sebagai lima mode produksi yang setara: V0 berfungsi sebagai kontrol untuk mengukur kontribusi murni dari setiap lapisan tokenisasi yang ditambahkan bertahap. V1 menjawab kebutuhan istilah klinis dasar (negasi, istilah majemuk, singkatan) yang lazim pada catatan medis. V2 menjawab langsung rumusan masalah utama, yaitu kesenjangan istilah antara \textit{query} dokter dan istilah dalam dokumen (misalnya ``CKD'' vs. ``penyakit ginjal kronis''). V3 diuji sebagai pendekatan alternatif berbasis karakter yang tahan terhadap variasi morfologi dan salah ketik tanpa bergantung pada \textit{lexicon} manual. V4 menguji apakah ekspansi otomatis berbasis \textit{pseudo-relevance feedback} dapat menyamai atau melampaui ekspansi manual pada V2. Dengan menjaga parameter BM25 identik pada seluruh varian, perbedaan hasil evaluasi pada Tabel~\ref{tab:eval} dapat diatribusikan secara adil ke lapisan tokenisasi masing-masing.
 
 \section{Implementasi}
 \subsection{Pembangunan Dataset dan Lexicon}
@@ -270,7 +279,7 @@ Mesin IR ditulis dalam Java dengan Apache Lucene 8.11.2. Karena OpenMRS membunde
 \subsection{Integrasi OpenMRS}
 Modul dikemas sebagai \texttt{.omod} dan mengekspos endpoint
 \path|GET /module/ir-bm25/search.json?q={keyword}&variant={v0..v4}&limit={k}|
-yang mengembalikan dokumen terurut beserta skor dan \textit{snippet}. Antarmuka pengguna menyediakan \textit{dropdown} untuk memilih varian serta mode ``bandingkan semua'' yang menampilkan kelima varian berdampingan. Link navigasi ditambahkan ke \textit{sidebar} Legacy UI melalui extension \texttt{org.openmrs.gutter.tools}. Gambar~\ref{fig:ui} menampilkan tangkapan layar mode perbandingan.
+yang mengembalikan dokumen terurut beserta skor dan \textit{snippet}. Antarmuka pengguna menyediakan \textit{dropdown} untuk memilih varian serta mode ``bandingkan semua'' yang menampilkan kelima varian berdampingan. Fungsi \textit{dropdown} ini bukan sekadar navigasi, melainkan alat \textit{ablation study} interaktif: pengguna (atau evaluator) dapat langsung mengamati perbedaan hasil pencarian antar-lapisan tokenisasi untuk \textit{query} yang sama, tanpa perlu menjalankan ulang \textit{pipeline} evaluasi secara terpisah. Link navigasi ditambahkan ke \textit{sidebar} Legacy UI melalui extension \texttt{org.openmrs.gutter.tools}. Gambar~\ref{fig:ui} menampilkan tangkapan layar mode perbandingan.
 
 \begin{figure}[h]
   \centering
@@ -299,7 +308,7 @@ Evaluasi dilakukan pada 50 \textit{query} dengan \textit{cutoff} $K = 10$, mengg
   \end{tabular}
 \end{table}
 
-Hasil menunjukkan bahwa V1 (normalisasi klinis) sedikit mengungguli baseline naif V0 pada P@10 dan nDCG@10, yang mendukung kontribusi lapisan tokenisasi klinis. Sementara itu, V2 dan V4 menurunkan presisi pada qrels ini, yang merupakan \textit{trade-off} wajar dari ekspansi; hal ini dilaporkan apa adanya dan menjadi arah untuk penyusunan qrels manual oleh klinisi pada tahap berikutnya. Secara fungsional, ekspansi singkatan terverifikasi bekerja: \textit{query} ``CKD'' berhasil menemukan dokumen berjudul ``Chronic Kidney Disease - Followup'', dan \textit{query} ``hypertension'' menemukan dokumen yang memuat singkatan ``HTN''.
+Hasil menunjukkan bahwa V1 (normalisasi klinis) sedikit mengungguli baseline naif V0 pada P@10 dan nDCG@10, yang mendukung kontribusi lapisan tokenisasi klinis. Sementara itu, V2 dan V4 menurunkan presisi pada qrels ini, yang merupakan \textit{trade-off} wajar dari ekspansi. Hal ini dilaporkan apa adanya dan menjadi arah untuk penyusunan qrels manual oleh klinisi pada tahap berikutnya. Secara fungsional, ekspansi singkatan terverifikasi bekerja: \textit{query} ``CKD'' berhasil menemukan dokumen berjudul ``Chronic Kidney Disease - Followup'', dan \textit{query} ``hypertension'' menemukan dokumen yang memuat singkatan ``HTN''.
 
 \section{Kesimpulan}
 Proyek ini berhasil mengimplementasikan mesin \textit{ranked retrieval} BM25 dengan lapisan normalisasi dan ekspansi klinis, mengintegrasikannya ke OpenMRS sebagai modul tambahan, serta mengevaluasinya melalui ablation study lima varian pada dataset MTSamples. Validasi berbasis dataset menunjukkan bahwa penanda negasi, istilah majemuk, dan singkatan medis muncul pada sebagian besar dokumen, sehingga tokenisasi klinis bukan sekadar asumsi. Hasil evaluasi menunjukkan perbaikan kecil namun konsisten dari normalisasi klinis (V1) dibanding baseline naif, sekaligus mengungkap \textit{trade-off} presisi pada varian ekspansi yang perlu ditindaklanjuti dengan \textit{relevance judgment} manual. Modul teruji berjalan pada OpenMRS 2.8.8 dan siap digunakan sebagai purwarupa pencarian cerdas bagi tenaga medis.

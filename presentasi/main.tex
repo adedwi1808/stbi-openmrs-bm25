@@ -57,7 +57,7 @@ Wiladahtul Awaliah & 25/569610/PPA/07174
     \column{0.48\textwidth}
     \begin{block}{Kontribusi}
       \begin{itemize}
-        \item Bukan sekadar ``BM25 di dataset medis'': studi \textbf{ablasi} lapisan normalisasi + ekspansi klinis.
+        \item Bukan sekadar ``BM25 di dataset medis'': studi ablasi lapisan normalisasi + ekspansi klinis.
         \item 5 varian retrieval (V0-V4) dibandingkan berdampingan.
         \item Modul OpenMRS + endpoint JSON + UI dropdown, teruji berjalan.
         \item Evaluasi TREC-style: P@K, Recall@K, nDCG@K.
@@ -88,12 +88,12 @@ Wiladahtul Awaliah & 25/569610/PPA/07174
       \begin{itemize}
         \item Integritas CSV diverifikasi byte-for-byte terhadap statistik resmi Kaggle.
         \item Pipeline \texttt{tools/build\_corpus.py}: bersihkan, gabungkan duplikat, saring $<$50 token.
-        \item Duplikat \textbf{digabung} (bukan dibuang) agar metadata multi-label dipertahankan.
+        \item Duplikat digabung (bukan dibuang) agar metadata multi-label dipertahankan.
       \end{itemize}
     \end{block}
     \column{0.48\textwidth}
     \begin{block}{Temuan penting}
-      \textit{medical\_specialty} multi-label (91,2\%), \textbf{tidak} valid sebagai \textit{ground-truth} relevansi $\Rightarrow$ qrels disusun terpisah (semi-otomatis, sadar-sinonim).
+      \textit{medical\_specialty} multi-label (91,2\%), tidak valid sebagai \textit{ground-truth} relevansi $\Rightarrow$ qrels disusun terpisah (semi-otomatis, sadar-sinonim).
     \end{block}
   \end{columns}
   \source{Sumber: \texttt{dataset/README.md}, \texttt{corpus\_stats.txt} [1].}
@@ -119,9 +119,9 @@ Wiladahtul Awaliah & 25/569610/PPA/07174
   \end{tabular}
   \vspace{0.22cm}
   \begin{block}{Gap yang diisi}
-    Belum ada studi yang mengevaluasi \textbf{lapisan normalisasi + ekspansi sinonim/singkatan klinis} untuk \textbf{BM25} pada \textbf{MTSamples}, apalagi yang diintegrasikan langsung ke \textbf{OpenMRS}.
+    Belum ada studi yang mengevaluasi lapisan normalisasi + ekspansi sinonim/singkatan klinis untuk BM25 pada MTSamples, apalagi yang diintegrasikan langsung ke OpenMRS.
   \end{block}
-  \source{Sumber: Mikkelsen (2026) [2]; Zhang (2021) [3]; Gayen dkk.\ (2023) [4]; Griffon dkk.\ (2012) [5].}
+  \source{Sumber: Mikkelsen (2026) [2], Zhang (2021) [3], Gayen dkk.\ (2023) [4], Griffon dkk.\ (2012) [5].}
 \end{frame}
 
 % 7
@@ -131,15 +131,15 @@ Wiladahtul Awaliah & 25/569610/PPA/07174
   \begin{columns}[T,onlytextwidth]
     \column{0.31\textwidth}
     \begin{block}{Negasi klinis}
-      \textbf{88,0\%} dokumen (13 term). \textit{Stopword list} umum membuang ``no/denies/without'', padahal maknanya berlawanan.
+      88,0\% dokumen (13 term). \textit{Stopword list} umum membuang ``no/denies/without'', padahal maknanya berlawanan.
     \end{block}
     \column{0.31\textwidth}
     \begin{block}{Istilah majemuk}
-      \textbf{60,9\%} dokumen (28 frasa). \textit{Tokenizer} kata-tunggal memecah ``shortness of breath'' jadi token lepas.
+      60,9\% dokumen (28 frasa). \textit{Tokenizer} kata-tunggal memecah ``shortness of breath'' jadi token lepas.
     \end{block}
     \column{0.31\textwidth}
     \begin{block}{Singkatan medis}
-      \textbf{28,8\%} dokumen (28 singkatan). ``c/o'', ``DM'', ``HTN'', ``CKD'' tak bermakna bila dipecah generik.
+      28,8\% dokumen (28 singkatan). ``c/o'', ``DM'', ``HTN'', ``CKD'' tak bermakna bila dipecah generik.
     \end{block}
   \end{columns}
   \vspace{0.15cm}
@@ -155,7 +155,7 @@ Wiladahtul Awaliah & 25/569610/PPA/07174
 
 % 9
 \begin{frame}{Lima Varian Retrieval (Ablation Study)}
-  \framesubtitle{Parameter BM25 sama ($k_1{=}1{,}2$, $b{=}0{,}75$); bedanya hanya lapisan tokenisasi.}
+  \framesubtitle{Parameter BM25 sama ($k_1{=}1{,}2$, $b{=}0{,}75$), bedanya hanya lapisan tokenisasi.}
   \small
   \renewcommand{\arraystretch}{1.2}
   \begin{tabular}{@{}c l l@{}}
@@ -173,6 +173,11 @@ Wiladahtul Awaliah & 25/569610/PPA/07174
   \begin{block}{Arsitektur}
     \scriptsize
     \texttt{corpus.jsonl} $\rightarrow$ \texttt{ClinicalNormalizer} $\rightarrow$ \texttt{IrIndexer} (index multi-field) $\rightarrow$ \texttt{IrSearcher} (BM25) $\rightarrow$ endpoint JSON $\rightarrow$ UI dropdown.
+  \end{block}
+  \vspace{0.15cm}
+  \begin{block}{Untuk apa 5 varian ini?}
+    \scriptsize
+    V0 = kontrol; V1 = istilah klinis dasar (negasi, singkatan); V2 = jembatani kesenjangan istilah dokter--dokumen (mis. ``CKD''); V3 = tahan typo/morfologi tanpa \textit{lexicon}; V4 = uji ekspansi otomatis vs. manual (V2). \textit{Dropdown} UI $=$ alat \textit{ablation study} interaktif, bukan 5 mode produksi setara.
   \end{block}
 \end{frame}
 
@@ -223,11 +228,11 @@ Wiladahtul Awaliah & 25/569610/PPA/07174
     \small
     \column{0.48\textwidth}
     \begin{block}{Temuan}
-      \textbf{V1 $>$ V0} pada P@10 \& nDCG@10 $\Rightarrow$ normalisasi klinis memberi perbaikan kecil namun konsisten. V2/V4 turun presisi (trade-off ekspansi), dilaporkan apa adanya.
+      V1 $>$ V0 pada P@10 \& nDCG@10 $\Rightarrow$ normalisasi klinis memberi perbaikan kecil namun konsisten. V2/V4 turun presisi (trade-off ekspansi), dilaporkan apa adanya.
     \end{block}
     \column{0.48\textwidth}
     \begin{block}{Verifikasi fungsional}
-      Query ``CKD'' $\rightarrow$ menemukan ``Chronic Kidney Disease - Followup''; ``hypertension'' $\rightarrow$ menemukan dokumen ber-``HTN''.
+      Query ``CKD'' $\rightarrow$ menemukan ``Chronic Kidney Disease - Followup''. Query ``hypertension'' $\rightarrow$ menemukan dokumen ber-``HTN''.
     \end{block}
   \end{columns}
   \source{Sumber: \texttt{eval/results.txt}, dijalankan via \texttt{EvalRunner}.}
@@ -278,7 +283,7 @@ Wiladahtul Awaliah & 25/569610/PPA/07174
       \item Mesin IR BM25 dengan lapisan normalisasi + ekspansi klinis, terintegrasi ke OpenMRS sebagai modul.
       \item Ablation study 5 varian pada dataset MTSamples (2.316 dokumen).
       \item Validasi berbasis data: negasi/majemuk/singkatan muncul di mayoritas dokumen.
-      \item Hasil: V1 (normalisasi klinis) unggul tipis atas baseline naif; trade-off presisi pada varian ekspansi dilaporkan jujur.
+      \item Hasil: V1 (normalisasi klinis) unggul tipis atas baseline naif, trade-off presisi pada varian ekspansi dilaporkan jujur.
       \item Purwarupa pencarian cerdas yang siap dipakai dan dapat diperluas.
     \end{itemize}
   \end{block}
