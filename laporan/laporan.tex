@@ -111,7 +111,7 @@
   Sistem Information Retrieval Berbasis BM25 pada Platform OpenMRS: Normalisasi dan Ekspansi Klinis untuk Pencarian Catatan Medis Teks Bebas
 \end{center}
 \vspace{0.4cm}
-\noindent Pencarian pada Rekam Medis Elektronik (RME) konvensional umumnya terbatas pada pencocokan kata kunci eksak, sehingga gagal menangani sinonim, singkatan, dan variasi terminologi medis pada catatan klinis teks bebas. Proyek ini mengimplementasikan mesin \textit{ranked retrieval} berbasis BM25 dan mengintegrasikannya ke dalam platform open-source OpenMRS sebagai modul tambahan. Kontribusi utamanya bukan sekadar penerapan BM25, melainkan studi ablasi terhadap lapisan normalisasi dan ekspansi klinis: stopword list yang mempertahankan penanda negasi, deteksi istilah majemuk, serta ekspansi singkatan dan sinonim medis. Sistem dievaluasi pada dataset MTSamples yang diproses menjadi 2.316 dokumen final, dengan lima varian retrieval (V0--V4) yang dibandingkan berdampingan. Hasil menunjukkan bahwa normalisasi klinis (V1) meningkatkan nDCG@10 dari 0,6832 menjadi 0,6865 dibanding baseline naif (V0), sementara varian ekspansi menunjukkan \textit{trade-off} presisi yang dilaporkan apa adanya. Modul yang dihasilkan diuji berjalan pada OpenMRS 2.8.8 dengan indeks Apache Lucene 8.11.2 yang di-\textit{shade} untuk menghindari konflik dependensi.
+\noindent Pencarian pada Rekam Medis Elektronik (RME) konvensional umumnya terbatas pada pencocokan kata kunci eksak, sehingga gagal menangani sinonim, singkatan, dan variasi terminologi medis pada catatan klinis teks bebas. Proyek ini mengimplementasikan mesin \textit{ranked retrieval} berbasis BM25 dan mengintegrasikannya ke dalam platform open-source OpenMRS sebagai modul tambahan. Kontribusi utamanya bukan sekadar penerapan BM25, melainkan studi ablasi terhadap lapisan normalisasi dan ekspansi klinis: stopword list yang mempertahankan penanda negasi, deteksi istilah majemuk, serta ekspansi singkatan dan sinonim medis. Sistem dievaluasi pada dataset MTSamples yang diproses menjadi 2.316 dokumen final, dengan lima varian retrieval (V0-V4) yang dibandingkan berdampingan. Hasil menunjukkan bahwa normalisasi klinis (V1) meningkatkan nDCG@10 dari 0,6832 menjadi 0,6865 dibanding baseline naif (V0), sementara varian ekspansi menunjukkan \textit{trade-off} presisi yang dilaporkan apa adanya. Modul yang dihasilkan diuji berjalan pada OpenMRS 2.8.8 dengan indeks Apache Lucene 8.11.2 yang di-\textit{shade} untuk menghindari konflik dependensi.
 
 \clearpage
 
@@ -151,7 +151,7 @@ Tujuan proyek ini adalah mengimplementasikan \textit{ranked retrieval} BM25, mem
 Sistem IR pada RME memungkinkan pencarian kasus klinis berdasarkan isi teks medis, bukan hanya metadata pasien. Berbeda dengan pencarian basis data relasional yang bergantung pada \textit{exact-match}, IR menggunakan model probabilistik atau vektorial untuk menentukan relevansi dokumen terhadap \textit{query}. Dalam domain klinis, tantangan IR meliputi variasi terminologi medis (sinonim), singkatan, dan dokumen dengan panjang yang sangat bervariasi, mulai dari laporan radiologi yang singkat hingga \textit{surgery report} yang panjang \citep{manning2008ir}.
 
 \subsection{Algoritma BM25}
-BM25 adalah model probabilistik perankingan dokumen yang dikembangkan oleh Robertson dkk. dan merupakan evolusi dari model klasik TF--IDF \citep{robertson2009bm25}. BM25 memperhitungkan tiga komponen utama: \textit{term frequency} (TF) yang di-\textit{saturate} untuk menghindari dominasi kata yang sangat sering muncul, \textit{inverse document frequency} (IDF) yang mengukur keunikan kata dalam koleksi, dan normalisasi panjang dokumen. Skor BM25 untuk dokumen $D$ dan \textit{query} $Q$ dihitung sebagai
+BM25 adalah model probabilistik perankingan dokumen yang dikembangkan oleh Robertson dkk. dan merupakan evolusi dari model klasik TF-IDF \citep{robertson2009bm25}. BM25 memperhitungkan tiga komponen utama: \textit{term frequency} (TF) yang di-\textit{saturate} untuk menghindari dominasi kata yang sangat sering muncul, \textit{inverse document frequency} (IDF) yang mengukur keunikan kata dalam koleksi, dan normalisasi panjang dokumen. Skor BM25 untuk dokumen $D$ dan \textit{query} $Q$ dihitung sebagai
 \[
 \mathrm{score}(D,Q) = \sum_{q_i \in Q} \mathrm{IDF}(q_i) \cdot \frac{\mathrm{TF}(q_i,D)\,(k_1+1)}{\mathrm{TF}(q_i,D) + k_1\left(1 - b + b\,\frac{|D|}{\mathrm{avgdl}}\right)}
 \]
@@ -170,15 +170,18 @@ Kajian pustaka lanjutan menunjukkan bahwa BM25 pada dataset MTSamples sudah pern
   \centering
   \caption{Perbandingan studi terkait dan perlakuan terhadap BM25.}
   \label{tab:gap}
-  \begin{tabular}{@{}p{3.9cm}p{5.0cm}p{4.4cm}@{}}
-    \toprule
+  \begin{tabular}{|p{3.9cm}|p{5.0cm}|p{4.4cm}|}
+    \hline
     \textbf{Studi} & \textbf{Fokus} & \textbf{Perlakuan terhadap BM25} \\
-    \midrule
+    \hline
     Mikkelsen (2026) & Benchmark \textit{embedding} vs BM25 & Baseline dengan tokenisasi lowercase + hapus tanda baca \\
+    \hline
     Zhang (2021) & Optimasi bobot skor BM25 & Perbaikan di fungsi skor, bukan tokenisasi \\
+    \hline
     Gayen dkk. (2023) & Porting tokenisasi Essie ke Solr & Tokenisasi klinis, bukan untuk BM25 di RME \\
+    \hline
     Griffon dkk. (2012) & Ekspansi sinonim UMLS & Untuk PubMed, bukan untuk RME \\
-    \bottomrule
+    \hline
   \end{tabular}
 \end{table}
 
@@ -197,7 +200,7 @@ Sistem terdiri atas tiga komponen utama: pipeline data (Python), mesin IR (Java/
   ]
     \node[box] (data) {Pipeline Data (Python): \texttt{build\_corpus.py} $\rightarrow$ \texttt{build\_lexicon.py} $\rightarrow$ \texttt{build\_qrels.py}};
     \node[box, below=of data] (engine) {Mesin IR (Java/Lucene 8): \texttt{ClinicalNormalizer} $\rightarrow$ \texttt{IrIndexer} (index multi-field) $\rightarrow$ \texttt{IrSearcher} (BM25)};
-    \node[box, below=of engine] (modul) {Modul OpenMRS: \texttt{IrBm25Service} $\rightarrow$ endpoint JSON $\rightarrow$ UI dropdown V0--V4};
+    \node[box, below=of engine] (modul) {Modul OpenMRS: \texttt{IrBm25Service} $\rightarrow$ endpoint JSON $\rightarrow$ UI dropdown V0-V4};
     \node[box, below=of modul] (eval) {Evaluasi: \texttt{EvalRunner} $\rightarrow$ Precision@K, Recall@K, nDCG@K};
 
     \draw[arr] (data) -- (engine);
@@ -218,16 +221,20 @@ Seluruh varian memakai parameter BM25 yang sama ($k_1 = 1{,}2$, $b = 0{,}75$). P
   \centering
   \caption{Lima varian retrieval pada ablation study.}
   \label{tab:varian}
-  \begin{tabular}{@{}c l p{8.2cm}@{}}
-    \toprule
+  \begin{tabular}{|c|l|p{8.2cm}|}
+    \hline
     \textbf{ID} & \textbf{Label} & \textbf{Strategi} \\
-    \midrule
+    \hline
     V0 & Naive BM25 & lowercase + hapus tanda baca (baseline) \\
+    \hline
     V1 & Normalisasi klinis & V0 + negasi dipertahankan + istilah majemuk + ekspansi singkatan \\
+    \hline
     V2 & Klinis + ekspansi & V1 + ekspansi sinonim query-side \\
-    V3 & Char n-gram & indexing karakter n-gram (3--5) \\
+    \hline
+    V3 & Char n-gram & indexing karakter n-gram (3-5) \\
+    \hline
     V4 & Klinis + ekspansi + PRF & V2 + \textit{pseudo-relevance feedback} \\
-    \bottomrule
+    \hline
   \end{tabular}
 \end{table}
 
@@ -241,17 +248,22 @@ Dataset final berisi 2.316 dokumen dari 4.999 baris mentah. Statistiknya dirangk
   \centering
   \caption{Statistik pembangunan dataset final.}
   \label{tab:dataset}
-  \begin{tabular}{@{}l r@{}}
-    \toprule
+  \begin{tabular}{|l|r|}
+    \hline
     \textbf{Metrik} & \textbf{Nilai} \\
-    \midrule
+    \hline
     Baris mentah & 4.999 \\
+    \hline
     Transkripsi kosong & 33 \\
+    \hline
     Baris duplikat & 2.609 \\
+    \hline
     Dokumen $<$ 50 token & 41 \\
+    \hline
     \textbf{Dokumen final} & \textbf{2.316} \\
+    \hline
     Multi-spesialisasi & 91,2\% \\
-    \bottomrule
+    \hline
   \end{tabular}
 \end{table}
 
@@ -261,15 +273,18 @@ Lexicon klinis yang dibangun beserta cakupannya pada dataset disajikan pada Tabe
   \centering
   \caption{Komponen lexicon klinis dan cakupan pada dataset (2.316 dokumen).}
   \label{tab:lexicon}
-  \begin{tabular}{@{}l c c@{}}
-    \toprule
+  \begin{tabular}{|l|c|c|}
+    \hline
     \textbf{Kategori} & \textbf{Jumlah} & \textbf{Cakupan} \\
-    \midrule
+    \hline
     Penanda negasi (\texttt{no}, \texttt{denies}, \texttt{without}) & 13 & 88,0\% \\
+    \hline
     Istilah majemuk (\texttt{shortness of breath}) & 28 & 60,9\% \\
+    \hline
     Singkatan medis (\texttt{c/o}, \texttt{DM}, \texttt{HTN}) & 28 & 28,8\% \\
-    Grup sinonim & 15 & -- \\
-    \bottomrule
+    \hline
+    Grup sinonim & 15 & - \\
+    \hline
   \end{tabular}
 \end{table}
 
@@ -295,16 +310,20 @@ Evaluasi dilakukan pada 50 \textit{query} dengan \textit{cutoff} $K = 10$, mengg
   \centering
   \caption{Hasil evaluasi ablation study (50 query, K = 10).}
   \label{tab:eval}
-  \begin{tabular}{@{}l c c c@{}}
-    \toprule
+  \begin{tabular}{|l|c|c|c|}
+    \hline
     \textbf{Varian} & \textbf{P@10} & \textbf{Recall@10} & \textbf{nDCG@10} \\
-    \midrule
+    \hline
     V0 · Naive BM25 & 0,5400 & \textbf{0,4312} & 0,6832 \\
+    \hline
     V1 · Normalisasi klinis & \textbf{0,5420} & 0,4284 & \textbf{0,6865} \\
+    \hline
     V2 · Klinis + ekspansi & 0,5120 & 0,4192 & 0,6509 \\
+    \hline
     V3 · Char n-gram & 0,5280 & 0,4055 & 0,6446 \\
+    \hline
     V4 · Klinis + ekspansi + PRF & 0,5020 & 0,4139 & 0,6186 \\
-    \bottomrule
+    \hline
   \end{tabular}
 \end{table}
 

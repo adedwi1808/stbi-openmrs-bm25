@@ -2,13 +2,13 @@ queries=50 k=10
 
 variant  label                                P@10  Recall@10    nDCG@10     resp(ms)
 ------------------------------------------------------------------------
-v0       Naive BM25                         0.5400     0.4312     0.6832         2.05
+v0       Naive BM25                         0.5400     0.4312     0.6832         2.48
   (evaluated 50 queries)
-v1       Normalisasi klinis                 0.5420     0.4284     0.6865         0.71
+v1       Normalisasi klinis                 0.5420     0.4284     0.6865         0.68
   (evaluated 50 queries)
-v2       Klinis + ekspansi                  0.5120     0.4192     0.6509         0.50
+v2       Klinis + ekspansi                  0.5120     0.4192     0.6509         0.65
   (evaluated 50 queries)
-v3       Char n-gram                        0.5280     0.4055     0.6446         2.05
+v3       Char n-gram                        0.5280     0.4055     0.6446         2.39
   (evaluated 50 queries)
-v4       Klinis + ekspansi + PRF            0.5020     0.4139     0.6186         2.11
+v4       Klinis + ekspansi + PRF            0.5020     0.4139     0.6186         3.43
   (evaluated 50 queries)

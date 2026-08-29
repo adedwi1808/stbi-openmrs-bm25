@@ -1,4 +1,5 @@
 % !TEX root = main.tex
+% !TEX program = xelatex
 \documentclass[aspectratio=169,10pt]{beamer}
 
 \usetheme{UGM}
@@ -27,6 +28,11 @@ Wiladahtul Awaliah & 25/569610/PPA/07174
 \date{2026}
 \setugmcoverdesc{LAPORAN AKHIR PROYEK STBI}
 
+\hypersetup{
+  pdftitle={Sistem Information Retrieval Berbasis BM25 pada Platform OpenMRS},
+  pdfauthor={Ade Dwi Prayitno, Aldi Indrawan, Ari Rudiatama, Dimas Ihdam Maulana, Wiladahtul Awaliah}
+}
+
 \newcommand{\source}[1]{\vfill{\scriptsize\raggedright\color{ugmBlueMid}#1\par}\vspace*{0.42cm}}
 \newcommand{\smallnote}[1]{{\scriptsize\color{ugmBlueMid}#1}}
 \newcommand{\keyword}[1]{\textbf{\color{ugmBlueDark}#1}}
@@ -43,7 +49,6 @@ Wiladahtul Awaliah & 25/569610/PPA/07174
 
 % 2
 \begin{frame}{Ringkasan Proyek}
-  \framesubtitle{Dari proposal sampai sistem berjalan, termasuk ablation study lima varian.}
   \begin{columns}[T,onlytextwidth]
     \small
     \column{0.48\textwidth}
@@ -71,31 +76,22 @@ Wiladahtul Awaliah & 25/569610/PPA/07174
 
 % 4
 \begin{frame}{Dataset Diverifikasi, Dataset Final Dibangun}
-  \framesubtitle{Data mentah diproses menjadi dataset siap indeks.}
   \centering
   \begin{tikzpicture}[
-    metric/.style={rounded corners=3pt,draw=ugmBlueDark,fill=ugmSoft,text width=2.28cm,minimum height=1.45cm,align=center,inner sep=5pt}]
+      metric/.style={rounded corners=3pt,draw=ugmBlueDark,fill=ugmSoft,text width=2.28cm,minimum height=1.45cm,align=center,inner sep=5pt}]
     \node[metric] (p) {\fontsize{14}{16}\selectfont\textbf{4.999}\\[-1pt]\scriptsize baris mentah};
     \node[metric,right=0.23cm of p] (e) {\fontsize{14}{16}\selectfont\textbf{2.609}\\[-1pt]\scriptsize baris duplikat};
     \node[metric,right=0.23cm of e] (o) {\fontsize{14}{16}\selectfont\textbf{2.316}\\[-1pt]\scriptsize dokumen final};
     \node[metric,right=0.23cm of o] (m) {\fontsize{14}{16}\selectfont\textbf{91,2\%}\\[-1pt]\scriptsize multi-spesialisasi};
   \end{tikzpicture}
   \vspace{0.3cm}
-  \begin{columns}[T,onlytextwidth]
-    \small
-    \column{0.48\textwidth}
-    \begin{block}{Apa yang dikerjakan}
-      \begin{itemize}
-        \item Integritas CSV diverifikasi byte-for-byte terhadap statistik resmi Kaggle.
-        \item Pipeline \texttt{tools/build\_corpus.py}: bersihkan, gabungkan duplikat, saring $<$50 token.
-        \item Duplikat digabung (bukan dibuang) agar metadata multi-label dipertahankan.
-      \end{itemize}
-    \end{block}
-    \column{0.48\textwidth}
-    \begin{block}{Temuan penting}
-      \textit{medical\_specialty} multi-label (91,2\%), tidak valid sebagai \textit{ground-truth} relevansi $\Rightarrow$ qrels disusun terpisah (semi-otomatis, sadar-sinonim).
-    \end{block}
-  \end{columns}
+  \small
+  \begin{block}{Apa yang dikerjakan}
+    \begin{itemize}
+      \item Pipeline \texttt{tools/build\_corpus.py}: bersihkan, gabungkan duplikat, saring $<$50 token.
+      \item Duplikat digabung (bukan dibuang) agar metadata multi-label dipertahankan.
+    \end{itemize}
+  \end{block}
   \source{Sumber: \texttt{dataset/README.md}, \texttt{corpus\_stats.txt} [1].}
 \end{frame}
 
@@ -104,29 +100,26 @@ Wiladahtul Awaliah & 25/569610/PPA/07174
 
 % 6
 \begin{frame}{BM25 pada MTSamples Sudah Diuji, tapi Sebagai Baseline Naif}
-  \framesubtitle{Gap: lapisan normalisasi \& ekspansi klinis untuk BM25 belum disasar.}
   \scriptsize
   \renewcommand{\arraystretch}{1.25}
-  \begin{tabular}{p{0.30\textwidth}p{0.34\textwidth}p{0.28\textwidth}}
-    \toprule
-    \textbf{Studi} & \textbf{Fokus} & \textbf{Perlakuan BM25} \\
-    \midrule
+  \begin{tabular}{|p{0.30\textwidth}|p{0.34\textwidth}|p{0.28\textwidth}|}
+    \hline
+    \textbf{Studi}                                                                         & \textbf{Fokus}                                                          & \textbf{Perlakuan BM25}                                                                                      \\
+    \hline
     Multi-Corpus Benchmark Study (Mikkelsen, 2026), termasuk dataset MTSamples ($n{=}500$) & Membandingkan model \textit{embedding} vs.\ BM25 untuk retrieval klinis & BM25 hanya \textit{baseline}: tokenisasi \textit{lowercase} + hapus tanda baca ($k_1{=}1{,}5$, $b{=}0{,}75$) \\
-    Improved BM25 untuk \textit{Precision Medicine} (Zhang, 2021) & Optimasi bobot skor BM25 (\textit{co-word} + Cuckoo Search) & Perbaikan fungsi skor, bukan tokenisasi/normalisasi \\
-    Gayen dkk.\ (2023): Essie $\to$ Solr & Tokenisasi klinis di Solr & Bukan untuk BM25 di RME \\
-    Griffon dkk.\ (2012): UMLS synonyms & Ekspansi sinonim UMLS & Untuk PubMed, bukan RME \\
-    \bottomrule
+    \hline
+    Improved BM25 untuk \textit{Precision Medicine} (Zhang, 2021)                          & Optimasi bobot skor BM25 (\textit{co-word} + Cuckoo Search)             & Perbaikan fungsi skor, bukan tokenisasi/normalisasi                                                          \\
+    \hline
+    Gayen dkk.\ (2023): Essie $\to$ Solr                                                   & Tokenisasi klinis di Solr                                               & Bukan untuk BM25 di RME                                                                                      \\
+    \hline
+    Griffon dkk.\ (2012): UMLS synonyms                                                    & Ekspansi sinonim UMLS                                                   & Untuk PubMed, bukan RME                                                                                      \\
+    \hline
   \end{tabular}
-  \vspace{0.22cm}
-  \begin{block}{Gap yang diisi}
-    Belum ada studi yang mengevaluasi lapisan normalisasi + ekspansi sinonim/singkatan klinis untuk BM25 pada MTSamples, apalagi yang diintegrasikan langsung ke OpenMRS.
-  \end{block}
   \source{Sumber: Mikkelsen (2026) [2], Zhang (2021) [3], Gayen dkk.\ (2023) [4], Griffon dkk.\ (2012) [5].}
 \end{frame}
 
 % 7
 \begin{frame}{Urgensi Diukur Langsung pada Dataset (Bukan Asumsi)}
-  \framesubtitle{Lexicon klinis yang dibangun + cakupannya pada 2.316 dokumen.}
   \small
   \begin{columns}[T,onlytextwidth]
     \column{0.31\textwidth}
@@ -155,53 +148,63 @@ Wiladahtul Awaliah & 25/569610/PPA/07174
 
 % 9
 \begin{frame}{Lima Varian Retrieval (Ablation Study)}
-  \framesubtitle{Parameter BM25 sama ($k_1{=}1{,}2$, $b{=}0{,}75$), bedanya hanya lapisan tokenisasi.}
   \small
   \renewcommand{\arraystretch}{1.2}
-  \begin{tabular}{@{}c l l@{}}
-    \toprule
-    \textbf{ID} & \textbf{Label} & \textbf{Strategi} \\
-    \midrule
-    V0 & Naive BM25 & lowercase + hapus tanda baca (baseline) \\
-    V1 & Normalisasi klinis & V0 + negasi dipertahankan + istilah majemuk + ekspansi singkatan \\
-    V2 & Klinis + ekspansi & V1 + ekspansi sinonim \textit{query-side} \\
-    V3 & Char n-gram & indexing karakter n-gram (3-5) \\
-    V4 & Klinis + ekspansi + PRF & V2 + \textit{pseudo-relevance feedback} \\
-    \bottomrule
+  \begin{tabular}{|c|l|l|}
+    \hline
+    \textbf{ID} & \textbf{Label}          & \textbf{Strategi}                                                \\
+    \hline
+    V0          & Naive BM25              & lowercase + hapus tanda baca (baseline)                          \\
+    \hline
+    V1          & Normalisasi klinis      & V0 + negasi dipertahankan + istilah majemuk + ekspansi singkatan \\
+    \hline
+    V2          & Klinis + ekspansi       & V1 + ekspansi sinonim \textit{query-side}                        \\
+    \hline
+    V3          & Char n-gram             & indexing karakter n-gram (3-5)                                   \\
+    \hline
+    V4          & Klinis + ekspansi + PRF & V2 + \textit{pseudo-relevance feedback}                          \\
+    \hline
   \end{tabular}
-  \vspace{0.2cm}
-  \begin{block}{Arsitektur}
-    \scriptsize
-    \texttt{corpus.jsonl} $\rightarrow$ \texttt{ClinicalNormalizer} $\rightarrow$ \texttt{IrIndexer} (index multi-field) $\rightarrow$ \texttt{IrSearcher} (BM25) $\rightarrow$ endpoint JSON $\rightarrow$ UI dropdown.
-  \end{block}
-  \vspace{0.15cm}
-  \begin{block}{Untuk apa 5 varian ini?}
-    \scriptsize
-    V0 = kontrol; V1 = istilah klinis dasar (negasi, singkatan); V2 = jembatani kesenjangan istilah dokter--dokumen (mis. ``CKD''); V3 = tahan typo/morfologi tanpa \textit{lexicon}; V4 = uji ekspansi otomatis vs. manual (V2). \textit{Dropdown} UI $=$ alat \textit{ablation study} interaktif, bukan 5 mode produksi setara.
-  \end{block}
 \end{frame}
 
-% 10
-\begin{frame}{Implementasi Selesai End-to-End}
-  \framesubtitle{Mesin IR (Java/Lucene 8) + integrasi OpenMRS, teruji berjalan.}
-  \scriptsize
-  \renewcommand{\arraystretch}{1.3}
-  \begin{tabular}{p{0.30\textwidth}p{0.20\textwidth}p{0.42\textwidth}}
-    \toprule
-    \textbf{Komponen} & \textbf{Status} & \textbf{Catatan} \\
-    \midrule
-    Mesin IR (Lucene 8 shaded) & \done & \texttt{IrIndexer}, \texttt{IrSearcher}, \texttt{ClinicalNormalizer}, BM25 $k_1{=}1{,}2$ $b{=}0{,}75$. \\
-    Index multi-field & \done & \texttt{content\_naive/clinical/ngram}, 2.316 dokumen. \\
-    Modul OpenMRS & \done & \texttt{IrBm25Service} + endpoint JSON + UI + \textit{sidebar} link. \\
-    \textit{Query set} \& qrels & \done & 50 query, qrels TREC semi-otomatis sadar-sinonim. \\
-    Evaluasi metrik & \done & P@10, Recall@10, nDCG@10 per varian. \\
-    \bottomrule
-  \end{tabular}
-  \vspace{0.15cm}
-  \begin{block}{Catatan teknis}
+% 9b
+\begin{frame}{Penjelasan Tiap Teknik}
+  \small
+  \begin{columns}[T,onlytextwidth]
+    \column{0.48\textwidth}
+    \textbf{\color{ugmBlueDark}Negasi dipertahankan (V1)}\\
     \scriptsize
-    OpenMRS membundel Lucene lama (tanpa BM25) $\Rightarrow$ Lucene 8.11.2 di-\textit{shade} (relokasi paket) agar tak bentrok. Modul target 1.11.6 teruji berjalan pada OpenMRS 2.8.8.
-  \end{block}
+    Penanda seperti \texttt{no}, \texttt{denies}, \texttt{without} biasanya dibuang \textit{stopword list} umum. Di sini dipertahankan agar makna klinis tidak terbalik (mis. ``no fever'' $\neq$ ``fever'').
+
+    \vspace{0.35cm}
+    \normalsize
+    \textbf{\color{ugmBlueDark}Istilah majemuk dikolaps (V1)}\\
+    \scriptsize
+    Frasa seperti ``shortness of breath'' diperlakukan sebagai satu unit makna, bukan dipecah menjadi token lepas oleh \textit{tokenizer} kata-tunggal.
+
+    \vspace{0.35cm}
+    \normalsize
+    \textbf{\color{ugmBlueDark}Ekspansi singkatan (V1)}\\
+    \scriptsize
+    Singkatan medis (\texttt{DM}, \texttt{HTN}, \texttt{CKD}, dst.) diekspansi dua arah, saat \textit{indexing} dan saat \textit{query}, sehingga bentuk singkat dan panjang saling ditemukan.
+
+    \column{0.48\textwidth}
+    \textbf{\color{ugmBlueDark}Ekspansi sinonim (V2)}\\
+    \scriptsize
+    Istilah awam pengguna (mis. ``high blood pressure'') diperluas ke istilah medis (mis. ``hypertension'') hanya di sisi \textit{query}, tanpa mengubah index.
+
+    \vspace{0.35cm}
+    \normalsize
+    \textbf{\color{ugmBlueDark}Char n-gram (V3)}\\
+    \scriptsize
+    Dokumen diindeks berbasis potongan karakter (3-5 huruf), bukan kata utuh, sehingga tahan terhadap salah ketik dan variasi morfologi tanpa bergantung pada \textit{lexicon}.
+
+    \vspace{0.35cm}
+    \normalsize
+    \textbf{\color{ugmBlueDark}Pseudo-relevance feedback (V4)}\\
+    \scriptsize
+    Ekspansi query otomatis: term yang sering muncul pada dokumen teratas hasil pencarian awal ditambahkan ke query, tanpa kamus manual.
+  \end{columns}
 \end{frame}
 
 % 11
@@ -209,19 +212,22 @@ Wiladahtul Awaliah & 25/569610/PPA/07174
 
 % 12
 \begin{frame}{Hasil Evaluasi: Normalisasi Klinis Meningkatkan nDCG}
-  \framesubtitle{50 query, cutoff K = 10.}
   \centering
   \renewcommand{\arraystretch}{1.25}
-  \begin{tabular}{@{}l c c c@{}}
-    \toprule
-    \textbf{Varian} & \textbf{P@10} & \textbf{Recall@10} & \textbf{nDCG@10} \\
-    \midrule
-    V0 · Naive BM25 & 0{,}5400 & \textbf{0{,}4312} & 0{,}6832 \\
-    V1 · Normalisasi klinis & \textbf{0{,}5420} & 0{,}4284 & \textbf{0{,}6865} \\
-    V2 · Klinis + ekspansi & 0{,}5120 & 0{,}4192 & 0{,}6509 \\
-    V3 · Char n-gram & 0{,}5280 & 0{,}4055 & 0{,}6446 \\
-    V4 · Klinis + ekspansi + PRF & 0{,}5020 & 0{,}4139 & 0{,}6186 \\
-    \bottomrule
+  \begin{tabular}{|l|c|c|c|}
+    \hline
+    \textbf{Varian}              & \textbf{P@10}     & \textbf{Recall@10} & \textbf{nDCG@10}  \\
+    \hline
+    V0 · Naive BM25              & 0{,}5400          & \textbf{0{,}4312}  & 0{,}6832          \\
+    \hline
+    V1 · Normalisasi klinis      & \textbf{0{,}5420} & 0{,}4284           & \textbf{0{,}6865} \\
+    \hline
+    V2 · Klinis + ekspansi       & 0{,}5120          & 0{,}4192           & 0{,}6509          \\
+    \hline
+    V3 · Char n-gram             & 0{,}5280          & 0{,}4055           & 0{,}6446          \\
+    \hline
+    V4 · Klinis + ekspansi + PRF & 0{,}5020          & 0{,}4139           & 0{,}6186          \\
+    \hline
   \end{tabular}
   \vspace{0.25cm}
   \begin{columns}[T,onlytextwidth]
@@ -240,7 +246,6 @@ Wiladahtul Awaliah & 25/569610/PPA/07174
 
 % 13
 \begin{frame}{Demo: Mode ``Bandingkan Semua''}
-  \framesubtitle{Kelima varian berdampingan untuk query yang sama (``hypertension'').}
   \centering
   \includegraphics[height=0.62\textheight]{../screenshots/02-compare-all-variants}
   \source{Tangkapan layar modul \texttt{ir-bm25} pada OpenMRS Legacy UI.}
@@ -248,35 +253,15 @@ Wiladahtul Awaliah & 25/569610/PPA/07174
 
 % 14
 \begin{frame}{Demo: Ekspansi Singkatan}
-  \framesubtitle{Query ``CKD'' menjembatani dokumen yang memuat ``chronic kidney disease''.}
   \centering
   \includegraphics[height=0.62\textheight]{../screenshots/03-ckd-abbreviation-expansion}
   \source{Tangkapan layar hasil pencarian (variant v2).}
 \end{frame}
 
 % 15
-\sectionframe{Kendala \& Kesimpulan}
+\sectionframe{Kesimpulan}
 
 % 16
-\begin{frame}{Kendala yang Sudah Ditangani}
-  \small
-  \begin{columns}[T,onlytextwidth]
-    \column{0.31\textwidth}
-    \begin{block}{Lisensi dataset}
-      Ambigu (CC0 di Kaggle vs.\ tanpa lisensi di mtsamples.com). \done: dilaporkan apa adanya pada laporan, tidak mengklaim satu lisensi bersih.
-    \end{block}
-    \column{0.31\textwidth}
-    \begin{block}{Ground truth evaluasi}
-      \textit{medical\_specialty} multi-label. \done: qrels disusun terpisah (semi-otomatis, sadar-sinonim), arah manual qrels dicatat.
-    \end{block}
-    \column{0.31\textwidth}
-    \begin{block}{Pilihan tokenizer}
-      \done: lexicon klinis kurasi terbuka (negasi, majemuk, singkatan, sinonim), bukan adaptasi UMLS yang berlisensi.
-    \end{block}
-  \end{columns}
-\end{frame}
-
-% 17
 \begin{frame}{Kesimpulan}
   \begin{block}{Apa yang dicapai}
     \begin{itemize}
@@ -304,7 +289,7 @@ Wiladahtul Awaliah & 25/569610/PPA/07174
 \end{frame}
 
 % 19
-\begin{quoteframe}[Sistem IR BM25 berjalan di OpenMRS: normalisasi klinis memberi perbaikan, varian ekspansi diukur apa adanya, purwarupa siap dipakai.]{Data terverifikasi, gap jelas, mesin berjalan, dan evaluasi lengkap.}
+\begin{quoteframe}[\textit{``Kita tenggelam dalam informasi, namun kehausan akan kebijaksanaan.''} - E.\,O.\ Wilson]{Terima Kasih}
 \end{quoteframe}
 
 \end{document}
