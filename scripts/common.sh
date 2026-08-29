@@ -19,8 +19,8 @@ MODULE_VERSION="1.0.0-SNAPSHOT"
 OMOD="$MODULE_DIR/omod/target/ir-bm25-$MODULE_VERSION.omod"
 
 # ---- Docker (OpenMRS 3.x reference application) ----------------------------
-BACKEND_CONTAINER="${BACKEND_CONTAINER:-$(docker ps --format '{{.Names}}' 2>/dev/null | grep -E 'backend' | head -n 1)}"
-DB_CONTAINER="${DB_CONTAINER:-$(docker ps --format '{{.Names}}' 2>/dev/null | grep -E '(^|-)db(-|$)' | head -n 1)}"
+BACKEND_CONTAINER="${BACKEND_CONTAINER:-$(docker ps --format '{{.Names}}' 2>/dev/null | grep -E 'backend' | head -n 1 || true)}"
+DB_CONTAINER="${DB_CONTAINER:-$(docker ps --format '{{.Names}}' 2>/dev/null | grep -E '(^|-)db(-|$)' | head -n 1 || true)}"
 
 # Paths inside the backend container.
 CORPUS_REMOTE="/openmrs/data/irbm25/corpus.jsonl"
