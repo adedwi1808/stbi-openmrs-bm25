@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import org.openmrs.api.APIException;
@@ -20,6 +21,7 @@ import org.openmrs.api.impl.BaseOpenmrsService;
 import org.openmrs.module.api.IrBm25Service;
 import org.openmrs.module.irbm25.ClinicalLexicon;
 import org.openmrs.module.irbm25.ClinicalNormalizer;
+import org.openmrs.module.irbm25.IrDocument;
 import org.openmrs.module.irbm25.IrSearchResult;
 import org.openmrs.module.irbm25.SearchVariant;
 import org.openmrs.module.irbm25.search.IrIndexer;
@@ -74,6 +76,33 @@ public class IrBm25ServiceImpl extends BaseOpenmrsService implements IrBm25Servi
 		}
 		catch (IOException e) {
 			throw new APIException("ir-bm25: search failed for query '" + query + "'", e);
+		}
+	}
+	
+	@Override
+	public IrDocument getDocument(String docId) throws APIException {
+		if (!isIndexReady()) {
+			throw new APIException("ir-bm25: index not ready (indexDirPath=" + indexDirPath
+			        + "). Call buildIndex first.");
+		}
+		try (IrSearcher searcher = new IrSearcher(Paths.get(indexDirPath), normalizer())) {
+			return searcher.getDocument(docId);
+		}
+		catch (IOException e) {
+			throw new APIException("ir-bm25: failed to load document '" + docId + "'", e);
+		}
+	}
+	
+	@Override
+	public List<String> getQueryTerms(String query, String variantId) throws APIException {
+		if (query == null || query.trim().isEmpty()) {
+			return Collections.emptyList();
+		}
+		try {
+			return IrSearcher.queryTermsFor(normalizer(), query, SearchVariant.fromId(variantId));
+		}
+		catch (IOException e) {
+			throw new APIException("ir-bm25: failed to analyze query '" + query + "'", e);
 		}
 	}
 	

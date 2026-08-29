@@ -13,6 +13,7 @@ import java.util.List;
 
 import org.openmrs.api.APIException;
 import org.openmrs.api.OpenmrsService;
+import org.openmrs.module.irbm25.IrDocument;
 import org.openmrs.module.irbm25.IrSearchResult;
 import org.openmrs.module.irbm25.SearchVariant;
 
@@ -40,6 +41,24 @@ public interface IrBm25Service extends OpenmrsService {
 	 * @return the ranked results
 	 */
 	List<IrSearchResult> search(String query, String variantId, int limit) throws APIException;
+	
+	/**
+	 * Loads a single indexed document by its corpus id, including the full transcription. Backs the
+	 * click-through detail view from the ranked result list.
+	 * 
+	 * @param docId the corpus document id (e.g. "mts-01873")
+	 * @return the document, or null if no document carries that id
+	 */
+	IrDocument getDocument(String docId) throws APIException;
+	
+	/**
+	 * The normalized query terms a variant would search with. Used by the detail view to highlight
+	 * why a document was retrieved.
+	 * 
+	 * @param query the free-text query
+	 * @param variantId one of "v0".."v4"
+	 */
+	List<String> getQueryTerms(String query, String variantId) throws APIException;
 	
 	/** All search variants available in the UI dropdown. */
 	List<SearchVariant> getSearchVariants();

@@ -29,6 +29,7 @@ import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.search.similarities.BM25Similarity;
 import org.apache.lucene.store.FSDirectory;
 import org.openmrs.module.irbm25.ClinicalNormalizer;
+import org.openmrs.module.irbm25.IrDocument;
 import org.openmrs.module.irbm25.IrSearchResult;
 import org.openmrs.module.irbm25.SearchVariant;
 
@@ -64,7 +65,7 @@ public class IrSearcher implements AutoCloseable {
 		if (variant == null) {
 			variant = SearchVariant.CLINICAL_EXPANDED;
 		}
-		List<String> terms = queryTerms(query, variant);
+		List<String> terms = queryTermsFor(normalizer, query, variant);
 		Query booleanQuery = buildQuery(terms, variant.getField(), 1.0f);
 		
 		if (variant.isPseudoRelevanceFeedback()) {
@@ -79,7 +80,16 @@ public class IrSearcher implements AutoCloseable {
 		return results;
 	}
 	
-	private List<String> queryTerms(String query, SearchVariant variant) throws IOException {
+	/**
+	 * The normalized (and, where applicable, synonym-expanded) terms a variant actually searches
+	 * with. Static because it needs only the normalizer, not the index: the detail view uses it to
+	 * highlight matches without opening the index a second time.
+	 */
+	public static List<String> queryTermsFor(ClinicalNormalizer normalizer, String query, SearchVariant variant)
+	        throws IOException {
+		if (variant == null) {
+			variant = SearchVariant.CLINICAL_EXPANDED;
+		}
 		if (variant == SearchVariant.NGRAM) {
 			return collectTerms(IrAnalyzers.ngramAnalyzer(), IrAnalyzers.FIELD_NGRAM, query);
 		}
@@ -89,6 +99,26 @@ public class IrSearcher implements AutoCloseable {
 			terms = normalizer.expandSynonyms(terms);
 		}
 		return dedupe(terms);
+	}
+	
+	/**
+	 * Looks up a single indexed document by its corpus id, including the full stored transcription.
+	 * The id field is indexed as a {@code StringField}, so an exact term lookup is enough.
+	 * 
+	 * @return the document, or null when no document carries that id
+	 */
+	public IrDocument getDocument(String docId) throws IOException {
+		if (docId == null || docId.trim().isEmpty()) {
+			return null;
+		}
+		TopDocs hits = searcher.search(new TermQuery(new Term(IrAnalyzers.FIELD_ID, docId.trim())), 1);
+		if (hits.scoreDocs.length == 0) {
+			return null;
+		}
+		Document doc = searcher.doc(hits.scoreDocs[0].doc);
+		return new IrDocument(doc.get(IrAnalyzers.FIELD_ID), doc.get(IrAnalyzers.FIELD_SAMPLE_NAME),
+		        doc.get(IrAnalyzers.FIELD_DESCRIPTION), doc.get(IrAnalyzers.FIELD_SPECIALTIES),
+		        doc.get(IrAnalyzers.FIELD_TEXT));
 	}
 	
 	private Query buildQuery(List<String> terms, String field, float boost) {
@@ -178,7 +208,7 @@ public class IrSearcher implements AutoCloseable {
 		return sb.toString();
 	}
 	
-	private List<String> collectTerms(Analyzer analyzer, String field, String text) throws IOException {
+	private static List<String> collectTerms(Analyzer analyzer, String field, String text) throws IOException {
 		List<String> terms = new ArrayList<>();
 		try (TokenStream stream = analyzer.tokenStream(field, new StringReader(text))) {
 			CharTermAttribute attr = stream.addAttribute(CharTermAttribute.class);
@@ -191,7 +221,7 @@ public class IrSearcher implements AutoCloseable {
 		return dedupe(terms);
 	}
 	
-	private List<String> dedupe(List<String> terms) {
+	private static List<String> dedupe(List<String> terms) {
 		Set<String> seen = new LinkedHashSet<>(terms);
 		return new ArrayList<>(seen);
 	}

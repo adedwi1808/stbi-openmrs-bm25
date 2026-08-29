@@ -2,6 +2,8 @@ package org.openmrs.module.api;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.nio.charset.StandardCharsets;
@@ -13,6 +15,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.openmrs.module.api.impl.IrBm25ServiceImpl;
+import org.openmrs.module.irbm25.IrDocument;
 import org.openmrs.module.irbm25.IrSearchResult;
 import org.openmrs.module.irbm25.SearchVariant;
 
@@ -51,6 +54,34 @@ public class IrBm25ServiceTest {
 		List<IrSearchResult> results = service.search("CKD", "v2", 10);
 		assertFalse(results.isEmpty());
 		assertEquals("mts-00001", results.get(0).getDocId());
+	}
+	
+	@Test
+	public void getDocument_shouldReturnFullTranscription() {
+		service.buildIndex(corpus.toString(), indexDir.toString());
+		
+		IrDocument doc = service.getDocument("mts-00001");
+		assertNotNull(doc);
+		assertEquals("CKD Followup", doc.getSampleName());
+		assertTrue(doc.getTranscription().contains("chronic kidney disease"));
+	}
+	
+	@Test
+	public void getDocument_shouldReturnNullForUnknownId() {
+		service.buildIndex(corpus.toString(), indexDir.toString());
+		assertNull(service.getDocument("mts-99999"));
+	}
+	
+	@Test
+	public void getQueryTerms_shouldExposeAbbreviationExpansion() {
+		List<String> terms = service.getQueryTerms("CKD", "v2");
+		assertTrue(terms.contains("ckd"));
+		assertTrue(terms.contains("kidney"));
+	}
+	
+	@Test
+	public void getQueryTerms_shouldBeEmptyForBlankQuery() {
+		assertTrue(service.getQueryTerms("  ", "v2").isEmpty());
 	}
 	
 	@Test

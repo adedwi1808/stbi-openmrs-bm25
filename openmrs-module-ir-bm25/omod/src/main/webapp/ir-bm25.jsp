@@ -43,9 +43,15 @@
 		</thead>
 		<tbody>
 			<c:forEach var="r" items="${results}" varStatus="st">
+				<c:url var="detailUrl" value="ir-bm25-doc.form">
+					<c:param name="id" value="${r.docId}"/>
+					<c:param name="q" value="${query}"/>
+					<c:param name="variant" value="${variant}"/>
+					<c:param name="limit" value="${limit}"/>
+				</c:url>
 				<tr>
 					<td>${st.index + 1}</td>
-					<td><strong><c:out value="${r.sampleName}"/></strong> <small>(<c:out value="${r.docId}"/>)</small></td>
+					<td><a href="${detailUrl}" title="<spring:message code="ir-bm25.viewDetail"/>"><strong><c:out value="${r.sampleName}"/></strong></a> <small>(<c:out value="${r.docId}"/>)</small></td>
 					<td>${r.score}</td>
 					<td><c:out value="${r.specialties}"/></td>
 					<td><c:out value="${r.snippet}"/></td>
@@ -67,9 +73,16 @@
 			</thead>
 			<tbody>
 				<c:forEach var="r" items="${entry.value}" varStatus="st">
+					<c:url var="detailUrl" value="ir-bm25-doc.form">
+						<c:param name="id" value="${r.docId}"/>
+						<c:param name="q" value="${query}"/>
+						<c:param name="variant" value="${entry.key.id}"/>
+						<c:param name="limit" value="${limit}"/>
+						<c:param name="back" value="all"/>
+					</c:url>
 					<tr>
 						<td>${st.index + 1}</td>
-						<td><strong><c:out value="${r.sampleName}"/></strong> <small>(<c:out value="${r.docId}"/>)</small></td>
+						<td><a href="${detailUrl}" title="<spring:message code="ir-bm25.viewDetail"/>"><strong><c:out value="${r.sampleName}"/></strong></a> <small>(<c:out value="${r.docId}"/>)</small></td>
 						<td>${r.score}</td>
 						<td><c:out value="${r.specialties}"/></td>
 					</tr>
