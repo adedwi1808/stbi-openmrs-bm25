@@ -8,13 +8,6 @@
 \usepackage{amsmath}
 \usetikzlibrary{arrows.meta,positioning,fit,calc}
 
-\definecolor{successGreen}{HTML}{2E7D5B}
-\definecolor{warnGold}{HTML}{B8860B}
-\definecolor{pendingGray}{HTML}{8A8A8A}
-\definecolor{softGold}{HTML}{FFF4C2}
-\definecolor{softGreen}{HTML}{E8F4EE}
-\definecolor{softGray}{HTML}{ECECEC}
-
 \title[OpenMRS BM25 MTSamples]{Sistem Information Retrieval Berbasis BM25\\pada Platform OpenMRS}
 \subtitle{Normalisasi \& Ekspansi Klinis pada Dataset MTSamples Medical Transcriptions}
 \author{\begin{tabular}{@{}l@{\hspace{0.45cm}}l@{}}
@@ -34,11 +27,6 @@ Wiladahtul Awaliah & 25/569610/PPA/07174
 }
 
 \newcommand{\source}[1]{\vfill{\scriptsize\raggedright\color{ugmBlueMid}#1\par}\vspace*{0.42cm}}
-\newcommand{\smallnote}[1]{{\scriptsize\color{ugmBlueMid}#1}}
-\newcommand{\keyword}[1]{\textbf{\color{ugmBlueDark}#1}}
-\newcommand{\done}{\textcolor{successGreen}{\textbf{Selesai}}}
-\newcommand{\statuspartial}{\textcolor{warnGold}{\textbf{Sebagian}}}
-\newcommand{\pending}{\textcolor{pendingGray}{\textbf{Belum mulai}}}
 
 \begin{document}
 
@@ -72,10 +60,10 @@ Wiladahtul Awaliah & 25/569610/PPA/07174
 \end{frame}
 
 % 3
-\sectionframe{Progress: Data \& Dataset}
+\sectionframe{Data \& Dataset}
 
 % 4
-\begin{frame}{Dataset Diverifikasi, Dataset Final Dibangun}
+\begin{frame}{Dari 4.999 Baris ke 2.316 Dokumen}
   \centering
   \begin{tikzpicture}[
       metric/.style={rounded corners=3pt,draw=ugmBlueDark,fill=ugmSoft,text width=2.28cm,minimum height=1.45cm,align=center,inner sep=5pt}]
@@ -99,10 +87,10 @@ Wiladahtul Awaliah & 25/569610/PPA/07174
 \sectionframe{Kajian Pustaka \& Gap}
 
 % 6
-\begin{frame}{BM25 pada MTSamples Sudah Diuji, tapi Sebagai Baseline Naif}
+\begin{frame}{BM25 di MTSamples: Sebatas Baseline}
   \scriptsize
   \renewcommand{\arraystretch}{1.25}
-  \begin{tabular}{|p{0.30\textwidth}|p{0.34\textwidth}|p{0.28\textwidth}|}
+  \begin{tabular}{|>{\raggedright\arraybackslash}p{0.29\textwidth}|>{\raggedright\arraybackslash}p{0.33\textwidth}|>{\raggedright\arraybackslash}p{0.27\textwidth}|}
     \hline
     \textbf{Studi}                                                                         & \textbf{Fokus}                                                          & \textbf{Perlakuan BM25}                                                                                      \\
     \hline
@@ -119,7 +107,7 @@ Wiladahtul Awaliah & 25/569610/PPA/07174
 \end{frame}
 
 % 7
-\begin{frame}{Urgensi Diukur Langsung pada Dataset (Bukan Asumsi)}
+\begin{frame}{Urgensi Diukur Langsung pada Dataset}
   \small
   \begin{columns}[T,onlytextwidth]
     \column{0.31\textwidth}
@@ -146,6 +134,8 @@ Wiladahtul Awaliah & 25/569610/PPA/07174
 % 8
 \sectionframe{Implementasi}
 
+
+
 % 9
 \begin{frame}{Lima Varian Retrieval (Ablation Study)}
   \small
@@ -165,6 +155,7 @@ Wiladahtul Awaliah & 25/569610/PPA/07174
     V4          & Klinis + ekspansi + PRF & V2 + \textit{pseudo-relevance feedback}                          \\
     \hline
   \end{tabular}
+  \source{Parameter BM25 identik pada kelima varian ($k_1{=}1{,}2$, $b{=}0{,}75$); fungsi skor: Robertson \& Zaragoza (2009) [6].}
 \end{frame}
 
 % 9b
@@ -211,7 +202,7 @@ Wiladahtul Awaliah & 25/569610/PPA/07174
 \sectionframe{Hasil \& Evaluasi}
 
 % 12
-\begin{frame}{Hasil Evaluasi: Normalisasi Klinis Meningkatkan nDCG}
+\begin{frame}{Hasil Evaluasi Lima Varian}
   \centering
   \renewcommand{\arraystretch}{1.25}
   \begin{tabular}{|l|c|c|c|}
@@ -234,7 +225,8 @@ Wiladahtul Awaliah & 25/569610/PPA/07174
     \small
     \column{0.48\textwidth}
     \begin{block}{Temuan}
-      V1 $>$ V0 pada P@10 \& nDCG@10 $\Rightarrow$ normalisasi klinis memberi perbaikan kecil namun konsisten. V2/V4 turun presisi (trade-off ekspansi), dilaporkan apa adanya.
+      \scriptsize
+      Selisih V1 vs V0 sangat kecil: nDCG +0,0033 dan P@10 +0,0020, setara \textbf{1 dokumen} dari 500 posisi terambil. Recall@10 justru turun. Belum ada uji signifikansi $\Rightarrow$ klaim yang aman: normalisasi klinis \textbf{tidak menurunkan} kualitas, dengan respons 3,6$\times$ lebih cepat (0,68 vs 2,48 ms).
     \end{block}
     \column{0.48\textwidth}
     \begin{block}{Verifikasi fungsional}
@@ -243,6 +235,7 @@ Wiladahtul Awaliah & 25/569610/PPA/07174
   \end{columns}
   \source{Sumber: \texttt{eval/results.txt}, dijalankan via \texttt{EvalRunner}.}
 \end{frame}
+
 
 % 13
 \begin{frame}{Demo: Mode ``Bandingkan Semua''}
@@ -268,7 +261,8 @@ Wiladahtul Awaliah & 25/569610/PPA/07174
       \item Mesin IR BM25 dengan lapisan normalisasi + ekspansi klinis, terintegrasi ke OpenMRS sebagai modul.
       \item Ablation study 5 varian pada dataset MTSamples (2.316 dokumen).
       \item Validasi berbasis data: negasi/majemuk/singkatan muncul di mayoritas dokumen.
-      \item Hasil: V1 (normalisasi klinis) unggul tipis atas baseline naif, trade-off presisi pada varian ekspansi dilaporkan jujur.
+      \item Hasil: V1 unggul tipis atas baseline naif, namun selisihnya dalam rentang \textit{noise} $\Rightarrow$ klaim dibatasi pada ``tidak menurunkan kualitas, respons lebih cepat''.
+      \item Keterbatasan qrels (metadata vs transkripsi) diidentifikasi dan menjelaskan sebagian besar penurunan varian ekspansi.
       \item Purwarupa pencarian cerdas yang siap dipakai dan dapat diperluas.
     \end{itemize}
   \end{block}

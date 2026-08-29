@@ -364,11 +364,21 @@ Hasil (`eval/results.txt`):
 
 **Interpretasi:**
 
-- **V1 > V0** pada P@10 dan nDCG@10 — mendukung klaim bahwa **normalisasi klinis** memberi
-  perbaikan (kecil namun konsisten) dibanding baseline naif.
-- **V2/V4** menurun presisi pada qrels ini — trade-off wajar dari ekspansi; qrels berbasis keyword
-  belum sepenuhnya menangkap kesetaraan sinonim. Ini dilaporkan apa adanya (bukan dipaksa menang)
-  dan menjadi arah untuk qrels manual oleh klinisi.
+- **V1 > V0** pada P@10 dan nDCG@10, tetapi selisihnya sangat kecil: +0.0020 P@10 setara hanya
+  **satu dokumen** yang berpindah masuk top-10 (270 → 271 dari 500 posisi terambil), dan +0.0033
+  nDCG setara +0.48% relatif. **Recall@10 justru turun** (0.4284 < 0.4312), jadi perbaikannya tidak
+  konsisten di ketiga metrik. Belum ada uji signifikansi — `EvalRunner` belum mengeluarkan skor
+  per-query. Klaim yang aman: normalisasi klinis **tidak menurunkan** kualitas peringkat sambil
+  memangkas waktu respons 3.6× (0.68 ms vs 2.48 ms).
+- **Recall@10 punya plafon 0.6762**, bukan 1.0 — rata-rata 22.3 dokumen relevan per query
+  (median 13.5, maksimum 98) tidak muat di cutoff K=10. Angka 0.4312 pada V0 setara ~64% plafon.
+- **V2/V3/V4** menurun presisi, tetapi sebagian besar dapat dijelaskan oleh keterbatasan protokol
+  qrels, bukan kegagalan varian: relevansi dinilai dari kolom metadata (`keywords`, `sample_name`,
+  `description`, rata-rata **44 token**) sedangkan yang diindeks adalah `transcription`
+  (rata-rata **466 token**) — ketimpangan **10.6×**. Sebanyak 526 dokumen (22.7%) tak punya
+  `keywords` sama sekali, dan hanya 841 dokumen (36.3%) pernah dinilai relevan untuk query mana pun.
+  Bias ini menghukum tepat varian yang dirancang menembus permukaan teks. Tindak lanjut: qrels
+  dinilai langsung pada isi `transcription` oleh penilai berlatar klinis.
 
 Menjalankan ulang evaluasi:
 
