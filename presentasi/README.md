@@ -1,6 +1,6 @@
 # Presentasi OpenMRS BM25 dengan MTSamples
 
-Presentasi Beamer bertema UGM untuk proposal proyek Sistem Information Retrieval berbasis BM25 pada OpenMRS, menggunakan MTSamples Medical Transcriptions sebagai korpus utama.
+Presentasi Beamer bertema UGM untuk proposal proyek Sistem Information Retrieval berbasis BM25 pada OpenMRS, menggunakan MTSamples Medical Transcriptions sebagai dataset utama.
 
 ## Kompilasi
 

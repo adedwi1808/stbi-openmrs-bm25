@@ -15,7 +15,7 @@
 \definecolor{softGray}{HTML}{ECECEC}
 
 \title[OpenMRS BM25 MTSamples]{Sistem Information Retrieval Berbasis BM25\\pada Platform OpenMRS}
-\subtitle{Normalisasi \& Ekspansi Klinis pada Korpus MTSamples Medical Transcriptions}
+\subtitle{Normalisasi \& Ekspansi Klinis pada Dataset MTSamples Medical Transcriptions}
 \author{\begin{tabular}{@{}l@{\hspace{0.45cm}}l@{}}
 Ade Dwi Prayitno & 25/563076/PPA/07097 \\
 Aldi Indrawan & 25/557923/PPA/07038 \\
@@ -67,11 +67,11 @@ Wiladahtul Awaliah & 25/569610/PPA/07174
 \end{frame}
 
 % 3
-\sectionframe{Progress: Data \& Korpus}
+\sectionframe{Progress: Data \& Dataset}
 
 % 4
-\begin{frame}{Dataset Diverifikasi, Korpus Final Dibangun}
-  \framesubtitle{Data mentah diproses menjadi korpus siap indeks.}
+\begin{frame}{Dataset Diverifikasi, Dataset Final Dibangun}
+  \framesubtitle{Data mentah diproses menjadi dataset siap indeks.}
   \centering
   \begin{tikzpicture}[
     metric/.style={rounded corners=3pt,draw=ugmBlueDark,fill=ugmSoft,text width=2.28cm,minimum height=1.45cm,align=center,inner sep=5pt}]
@@ -111,7 +111,7 @@ Wiladahtul Awaliah & 25/569610/PPA/07174
     \toprule
     \textbf{Studi} & \textbf{Fokus} & \textbf{Perlakuan BM25} \\
     \midrule
-    Multi-Corpus Benchmark Study (Mikkelsen, 2026), termasuk korpus MTSamples ($n{=}500$) & Membandingkan model \textit{embedding} vs.\ BM25 untuk retrieval klinis & BM25 hanya \textit{baseline}: tokenisasi \textit{lowercase} + hapus tanda baca ($k_1{=}1{,}5$, $b{=}0{,}75$) \\
+    Multi-Corpus Benchmark Study (Mikkelsen, 2026), termasuk dataset MTSamples ($n{=}500$) & Membandingkan model \textit{embedding} vs.\ BM25 untuk retrieval klinis & BM25 hanya \textit{baseline}: tokenisasi \textit{lowercase} + hapus tanda baca ($k_1{=}1{,}5$, $b{=}0{,}75$) \\
     Improved BM25 untuk \textit{Precision Medicine} (Zhang, 2021) & Optimasi bobot skor BM25 (\textit{co-word} + Cuckoo Search) & Perbaikan fungsi skor, bukan tokenisasi/normalisasi \\
     Gayen dkk.\ (2023): Essie $\to$ Solr & Tokenisasi klinis di Solr & Bukan untuk BM25 di RME \\
     Griffon dkk.\ (2012): UMLS synonyms & Ekspansi sinonim UMLS & Untuk PubMed, bukan RME \\
@@ -125,7 +125,7 @@ Wiladahtul Awaliah & 25/569610/PPA/07174
 \end{frame}
 
 % 7
-\begin{frame}{Urgensi Diukur Langsung pada Korpus (Bukan Asumsi)}
+\begin{frame}{Urgensi Diukur Langsung pada Dataset (Bukan Asumsi)}
   \framesubtitle{Lexicon klinis yang dibangun + cakupannya pada 2.316 dokumen.}
   \small
   \begin{columns}[T,onlytextwidth]
@@ -276,7 +276,7 @@ Wiladahtul Awaliah & 25/569610/PPA/07174
   \begin{block}{Apa yang dicapai}
     \begin{itemize}
       \item Mesin IR BM25 dengan lapisan normalisasi + ekspansi klinis, terintegrasi ke OpenMRS sebagai modul.
-      \item Ablation study 5 varian pada korpus MTSamples (2.316 dokumen).
+      \item Ablation study 5 varian pada dataset MTSamples (2.316 dokumen).
       \item Validasi berbasis data: negasi/majemuk/singkatan muncul di mayoritas dokumen.
       \item Hasil: V1 (normalisasi klinis) unggul tipis atas baseline naif; trade-off presisi pada varian ekspansi dilaporkan jujur.
       \item Purwarupa pencarian cerdas yang siap dipakai dan dapat diperluas.

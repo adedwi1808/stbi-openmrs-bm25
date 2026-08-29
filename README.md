@@ -11,7 +11,7 @@ dalam platform **OpenMRS** sebagai modul tambahan.
 
 Kontribusi utama proyek ini bukan sekadar "BM25 di dataset medis", melainkan studi **ablasi**
 terhadap **lapisan normalisasi & ekspansi klinis** (penanganan negasi, istilah majemuk, singkatan,
-dan sinonim medis) yang diuji langsung terhadap *baseline* BM25 naif pada korpus **MTSamples**.
+dan sinonim medis) yang diuji langsung terhadap *baseline* BM25 naif pada dataset **MTSamples**.
 
 ---
 
@@ -53,11 +53,11 @@ BM25 pada teks klinis umumnya hanya dijadikan *baseline* naif:
 | Griffon dkk. (2012) — *UMLS synonyms* | Ekspansi sinonim UMLS | Untuk PubMed, bukan untuk RME |
 
 **Gap yang diisi proyek ini:** belum ada studi yang secara khusus mengevaluasi **lapisan
-normalisasi + ekspansi sinonim/singkatan klinis** untuk **BM25** pada korpus **MTSamples**, apalagi
-yang diintegrasikan langsung ke **OpenMRS**. Gap ini divalidasi secara empiris dari korpus sendiri
+normalisasi + ekspansi sinonim/singkatan klinis** untuk **BM25** pada dataset **MTSamples**, apalagi
+yang diintegrasikan langsung ke **OpenMRS**. Gap ini divalidasi secara empiris dari dataset sendiri
 (lihat tabel di bawah) dan diuji sebagai ablation study (V0–V4).
 
-### Bukti dari korpus (2.316 dokumen)
+### Bukti dari dataset (2.316 dokumen)
 
 | Sinyal klinis | Cakupan dokumen | Contoh |
 |---|---|---|
@@ -124,7 +124,7 @@ flowchart LR
 
 **Index multi-field** (satu index, banyak *field* per *analyzer*):
 `content_naive` · `content_clinical` · `content_ngram` — sehingga perbandingan antar varian adil
-(satu korpus, parameter BM25 identik, hanya *field*/*query* yang berbeda).
+(satu dataset, parameter BM25 identik, hanya *field*/*query* yang berbeda).
 
 ---
 
@@ -136,7 +136,7 @@ stbi-openmrs-bm25/
 │   ├── README.md                    #   provenance + verifikasi integritas
 │   └── mtsamples/
 │       ├── mtsamples.csv            #   dataset mentah (Kaggle mirror)
-│       ├── corpus.jsonl             #   korpus final (2.316 dokumen)
+│       ├── corpus.jsonl             #   dataset final (2.316 dokumen)
 │       ├── corpus_stats.txt         #   laporan statistik
 │       └── ingest_map.json          #   pemetaan doc → UUID OpenMRS
 ├── tools/                           # Pipeline data (Python)
@@ -232,7 +232,7 @@ Detail lebih lanjut ada di [`scripts/README.md`](scripts/README.md).
 
 ## Pipeline Data
 
-### 1. Membangun korpus (`tools/build_corpus.py`)
+### 1. Membangun dataset (`tools/build_corpus.py`)
 
 Dari `mtsamples.csv` (4.999 baris) dihasilkan `corpus.jsonl` (2.316 dokumen):
 
