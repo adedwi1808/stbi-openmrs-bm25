@@ -118,7 +118,7 @@ flowchart LR
     C --> G
     D --> F
     H --> I
-    E --> L[EvalRunner<br/>P@K Recall@K nDCG@K]
+    E --> L["EvalRunner<br/>P@K Recall@K nDCG@K"]
     H --> L
 ```
 
