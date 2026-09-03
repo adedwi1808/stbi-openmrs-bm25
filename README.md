@@ -395,9 +395,6 @@ scripts/eval.sh 10
 - **Asal data**: `mtsamples.com` (nama & tanggal telah dianonimkan).
 - **Verifikasi**: file diperiksa *byte-for-byte* terhadap statistik resmi Kaggle sebelum dipakai
   (lihat `dataset/README.md`).
-- **⚠️ Lisensi ambigu**: Kaggle mencantumkan CC0, namun `mtsamples.com` tidak mencantumkan lisensi
-  eksplisit (mirror lain menandai Apache-2.0). Laporan akhir menyatakan ambiguitas ini apa adanya,
-  bukan mengklaim satu lisensi bersih. Silakan baca `dataset/README.md` sebelum mendistribusikan ulang.
 
 ---
 
