@@ -22,6 +22,11 @@ OMOD="$MODULE_DIR/omod/target/ir-bm25-$MODULE_VERSION.omod"
 BACKEND_CONTAINER="${BACKEND_CONTAINER:-$(docker ps --format '{{.Names}}' 2>/dev/null | grep -E 'backend' | head -n 1 || true)}"
 DB_CONTAINER="${DB_CONTAINER:-$(docker ps --format '{{.Names}}' 2>/dev/null | grep -E '(^|-)db(-|$)' | head -n 1 || true)}"
 
+# Tag for the reference application images (compose resolves `${TAG:-qa}`).
+# `qa` is a moving tag; pin it here, or per-run via `OPENMRS_TAG=... make openmrs`,
+# to get the same stack twice. Verified working: see docs/DEVELOPMENT.md.
+OPENMRS_TAG="${OPENMRS_TAG:-qa}"
+
 # Paths inside the backend container.
 CORPUS_REMOTE="/openmrs/data/irbm25/corpus.jsonl"
 INDEX_REMOTE="/openmrs/data/irbm25/index"

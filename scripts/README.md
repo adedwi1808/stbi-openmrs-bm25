@@ -58,3 +58,4 @@ via the `org.openmrs.gutter.tools` extension.
 | `BACKEND_CONTAINER` | auto-detected (`*backend*`) | deploy.sh, openmrs.sh |
 | `DB_CONTAINER` | auto-detected (`*db*`) | deploy.sh |
 | `DB_USER` / `DB_PASS` / `DB_NAME` | `openmrs` / `openmrs` / `openmrs` | deploy.sh |
+| `OPENMRS_TAG` | `qa` | openmrs.sh (tag image reference application) |

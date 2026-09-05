@@ -50,6 +50,18 @@ Gunakan skrip `scripts/cli.sh` untuk menjalankan fungsi index, search, atau eval
 - `scripts/deploy.sh` (menyalin `.omod` dan corpus, mengatur global property, dan merestart backend).
 - Global property yang digunakan: `irbm25.corpusPath`, `irbm25.indexDir`.
 - Index akan dibangun secara otomatis saat modul startup.
+- Direktori `openmrs-distro-referenceapplication/` adalah clone upstream yang di-gitignore;
+  `scripts/openmrs.sh` meng-clone-nya otomatis bila belum ada.
+- Compose memakai tag image `${TAG:-qa}`. `qa` adalah tag berjalan, jadi mesin lain bisa
+  mendapat versi berbeda. Override dengan `OPENMRS_TAG=<tag> make openmrs`.
+  Kombinasi image yang sudah diverifikasi jalan dengan modul ini (5 Sep 2026):
+
+  ```
+  backend  @sha256:b90294dc5905195a4e146d0824ad90cb7c60a70afa653a86483c3fcf7a37c6d9
+  frontend @sha256:cddd488d775302334dcad8d5bd216f442dbb962630db384ba98ba159f1424bd9
+  gateway  @sha256:003209be27cabcc3250fba762f9c25c34beafed4499bb1cb4ce5c6db5e2a26ff
+  db       mariadb:10.11.7
+  ```
 
 ## 10. Konvensi kode / kontribusi
 - Ikuti gaya kode standar Java.

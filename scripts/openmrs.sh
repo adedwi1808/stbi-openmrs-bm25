@@ -13,18 +13,27 @@ set -euo pipefail
 source "$(dirname "${BASH_SOURCE[0]}")/common.sh"
 
 DISTRO_DIR="$REPO_ROOT/openmrs-distro-referenceapplication"
+DISTRO_REPO="https://github.com/openmrs/openmrs-distro-referenceapplication.git"
 cmd="${1:-status}"
+
+# The distro is an upstream clone (gitignored, own git history), so it is absent
+# on a fresh checkout. Clone it on demand instead of failing inside docker compose.
+if [ ! -f "$DISTRO_DIR/docker-compose.yml" ]; then
+	echo "OpenMRS distro not found at $DISTRO_DIR" >&2
+	echo "Cloning $DISTRO_REPO ..." >&2
+	git clone --depth 1 "$DISTRO_REPO" "$DISTRO_DIR"
+fi
 
 case "$cmd" in
 	up)
-		docker compose -f "$DISTRO_DIR/docker-compose.yml" up -d
+		TAG="$OPENMRS_TAG" docker compose -f "$DISTRO_DIR/docker-compose.yml" up -d
 		echo "OpenMRS starting... Legacy UI: http://localhost/openmrs  SPA: http://localhost/openmrs/spa"
 		;;
 	down)
-		docker compose -f "$DISTRO_DIR/docker-compose.yml" down
+		TAG="$OPENMRS_TAG" docker compose -f "$DISTRO_DIR/docker-compose.yml" down
 		;;
 	status)
-		docker compose -f "$DISTRO_DIR/docker-compose.yml" ps
+		TAG="$OPENMRS_TAG" docker compose -f "$DISTRO_DIR/docker-compose.yml" ps
 		;;
 	logs)
 		docker logs --tail "${2:-100}" -f "$BACKEND_CONTAINER"

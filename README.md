@@ -174,6 +174,14 @@ stbi-openmrs-bm25/
 | Maven | 3.x | build modul OpenMRS |
 | Docker + Compose | — | menjalankan OpenMRS (opsional) |
 
+> **Catatan:** direktori `openmrs-distro-referenceapplication/` adalah *clone* repo upstream
+> (punya git history sendiri, jadi di-*gitignore* dan **tidak ikut** saat repo ini di-clone).
+> `scripts/openmrs.sh` akan meng-clone-nya otomatis bila belum ada; untuk manual:
+>
+> ```bash
+> git clone --depth 1 https://github.com/openmrs/openmrs-distro-referenceapplication.git
+> ```
+
 > **Catatan:** modul ditulis menargetkan OpenMRS platform **1.11.6**, namun diuji berjalan pada
 > **OpenMRS 2.8.8** (Reference Application 3.x). Lucene 8.11.2 di-*shade* (relokasi package ke
 > `org.openmrs.module.irbm25.shaded.lucene`) agar tidak bentrok dengan Lucene bawaan OpenMRS.
